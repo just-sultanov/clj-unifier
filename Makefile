@@ -51,9 +51,6 @@ test-clj: ## Run Clojure tests
 
 
 test: test-clj test-cljs ## Run tests
-	@echo "=================================================================="
-	@echo "Run tests..."
-	@echo "=================================================================="
 
 
 jar: ## Build jar
