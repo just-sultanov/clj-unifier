@@ -43,7 +43,7 @@
 
 (defn with-type [type x]
   (if (vector? type)
-    (update x :type #(->> % (conj type)))
+    (update x :type #(conj type %))
     (assoc x :type type)))
 
 (defn as-http-response [x]
