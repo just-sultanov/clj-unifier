@@ -4,17 +4,25 @@
 ;; Defaults
 ;;;;
 
-(defonce default-error-type
+(defonce ^{:added "0.0.3" :doc "Default error `type`."}
+  default-error-type
   (atom :error))
 
-(defonce default-success-type
+(defonce ^{:added "0.0.3" :doc "Default success `type`."}
+  default-success-type
   (atom :success))
 
 
-(defn set-default-error-type! [type]
+(defn set-default-error-type!
+  "Overrides default error `type`."
+  {:added "0.0.3"}
+  [type]
   (reset! default-error-type type))
 
-(defn set-default-success-type! [type]
+(defn set-default-success-type!
+  "Overrides default success `type`."
+  {:added "0.0.3"}
+  [type]
   (reset! default-success-type type))
 
 
@@ -24,13 +32,21 @@
 ;;;;
 
 (defprotocol IUnifiedResponse
-  (-response? [_])
-  (-error? [_])
-  (-success? [_])
-  (-get-type [_])
-  (-get-data [_])
-  (-get-meta [_]))
+  (-response? [_]
+    "Returns `true` if the given value is implements `unifier.response/IUnifiedResponse` protocol. Otherwise `false`.")
+  (-error? [_]
+    "Returns `true` if the given value is instance of `unifier.response/UnifiedError`. Otherwise `false`.")
+  (-success? [_]
+    "Returns `true` if the given value is instance of `unifier.response/UnifiedSuccess`. Otherwise `false`.")
+  (-get-type [_]
+    "Returns `type` of response.")
+  (-get-data [_]
+    "Returns `data` of response.")
+  (-get-meta [_]
+    "Returns `meta` of response."))
 
+;; Extends all objects for compatibility.
+;; Returns `false` for all `IUnifiedResponse` protocol predicates and identity for `get-data`
 (extend-protocol IUnifiedResponse
   #?(:clj Object :cljs js/Object)
   (-response? [_] false)
@@ -46,22 +62,40 @@
 ;; Getters wrappers
 ;;;;
 
-(defn response? [x]
+(defn response?
+  "Returns `true` if the given value is implements `unifier.response/IUnifiedResponse` protocol. Otherwise `false`."
+  {:added "0.0.3"}
+  [x]
   (-response? x))
 
-(defn error? [x]
+(defn error?
+  "Returns `true` if the given value is instance of `unifier.response/UnifiedError`. Otherwise `false`."
+  {:added "0.0.3"}
+  [x]
   (-error? x))
 
-(defn success? [x]
+(defn success?
+  "Returns `true` if the given value is instance of `unifier.response/UnifiedSuccess`. Otherwise `false`."
+  {:added "0.0.3"}
+  [x]
   (-success? x))
 
-(defn get-type [x]
+(defn get-type
+  "Returns `type` of response."
+  {:added "0.0.3"}
+  [x]
   (-get-type x))
 
-(defn get-data [x]
+(defn get-data
+  "Returns `data` of response."
+  {:added "0.0.3"}
+  [x]
   (-get-data x))
 
-(defn get-meta [x]
+(defn get-meta
+  "Returns `meta` of response."
+  {:added "0.0.3"}
+  [x]
   (-get-meta x))
 
 
@@ -95,6 +129,17 @@
 ;;;;
 
 (defn as-error
+  "Returns instance of `unifier.response/UnifiedError`.
+  Examples:
+    * with default error `type`
+    (as-error \"a user was not found\")
+
+    * with specified error `type`
+    (as-error :user/not-found \"a user was not found\")
+
+    * with specified error `type` and `meta`
+    (as-error :user/not-found \"john@doe.com\" {:i18/key :user/not-found})"
+  {:added "0.0.3"}
   ([data]
    (as-error @default-error-type data nil))
   ([type data]
@@ -103,6 +148,17 @@
    (->UnifiedError type data meta)))
 
 (defn as-success
+  "Returns instance of `unifier.response/UnifiedSuccess`.
+  Examples:
+    * with default success `type`
+    (as-success \"a user was created successfully\")
+
+    * with specified success `type`
+    (as-success :user/created \"a user was created successfully\")
+
+    * with specified success `type` and `meta`
+    (as-success :user/created \"a user was created successfully\" {:i18/key :user/user/created})"
+  {:added "0.0.3"}
   ([data]
    (as-success @default-success-type data nil))
   ([type data]
@@ -116,7 +172,10 @@
 ;; Response handlers
 ;;;;
 
-(defmulti as-response get-type)
+(defmulti as-response
+  "A dispatcher for the unified responses."
+  get-type)
 
+;; Returns identity by default
 (defmethod as-response :default [x] x)
 (defmethod as-response nil [x] x)
