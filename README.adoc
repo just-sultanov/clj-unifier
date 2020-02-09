@@ -1,0 +1,77 @@
+image:https://img.shields.io/github/license/just-sultanov/clj-unifier[License,link=LICENSE]
+image:https://github.com/just-sultanov/clj-unifier/workflows/build/badge.svg[Build]
+image:https://github.com/just-sultanov/clj-unifier/workflows/deploy/badge.svg[Deploy]
+image:https://img.shields.io/clojars/v/clj-unifier.svg[Clojars,link=https://clojars.org/clj-unifier]
+
+== clj-unifier
+
+A Clojure(Script) library for unified responses.
+
+=== Quick Start Guide
+
+Add the following dependency in your project:
+
+[source,clojure]
+----
+;; project.clj or build.boot
+[clj-unifier "RELEASE"]
+
+;; deps.edn
+{:deps {clj-unifier {:mvn/version "RELEASE"}}}
+
+----
+
+=== Examples
+
+You can see full examples link:dev/src/unifier/example.cljc[here].
+
+=== Development
+
+[source,bash]
+----
+# Run REPL & connect from your IDE
+$ make dev
+----
+
+=== Testing
+
+[source,bash]
+----
+# Run tests
+$ make test
+----
+
+=== Deploy
+
+[source,bash]
+----
+# create a new git tag (available types `patch`, `minor`, `major`)
+$ make patch
+
+# push a new git tag
+$ make release
+----
+
+=== Available commands
+
+[source,bash]
+----
+$ make help
+help                           Show help
+clean                          Clean
+dev                            Run REPL
+lint                           Run linter
+test                           Run tests
+jar                            Build jar
+install                        Install locally
+deploy                         Deploy to repository
+init                           Init first version
+patch                          Increment patch version
+minor                          Increment minor version
+major                          Increment major version
+release                        Release a new version
+----
+
+=== License
+
+link:LICENSE[Copyright © 2019-2020 Ilshat Sultanov]

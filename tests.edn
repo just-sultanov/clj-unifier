@@ -1,0 +1,26 @@
+#kaocha/v1
+    {:plugins        [:kaocha.plugin.alpha/info
+                      :kaocha.plugin/cloverage
+                      :kaocha.plugin/print-invocations
+                      :kaocha.plugin/hooks
+                      :kaocha.plugin/notifier]
+
+     :tests          [{:id   :clj
+                       :type :kaocha.type/clojure.test}
+                      {:id   :cljs
+                       :type :kaocha.type/cljs}]
+
+     :cloverage/opts {:output           "target/coverage"
+                      :ns-regex         []
+                      :ns-exclude-regex []
+                      :fail-threshold   0
+                      :low-watermark    50
+                      :high-watermark   80
+                      :summary?         true
+                      :text?            false
+                      :emma-xml?        false
+                      :html?            true
+                      :nop?             false
+                      :lcov?            false
+                      :coveralls?       false
+                      :codecov?         true}}

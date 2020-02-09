@@ -1,0 +1,27 @@
+{:paths   ["src"]
+
+ :deps    {org.clojure/clojure       {:mvn/version "1.10.1"}
+           org.clojure/clojurescript {:mvn/version "1.10.597"}}
+
+ :aliases {:dev     {:extra-deps  {nrepl            {:mvn/version "0.6.0"}
+                                   cider/piggieback {:mvn/version "0.4.2"}}
+                     :extra-paths ["dev/src"]
+                     :main-opts   ["--main" "nrepl.cmdline"
+                                   "--middleware" "[cider.piggieback/wrap-cljs-repl]"]}
+
+           :test    {:extra-deps  {lambdaisland/kaocha           {:mvn/version "0.0-590"}
+                                   lambdaisland/kaocha-cljs      {:mvn/version "0.0-68"}
+                                   lambdaisland/kaocha-cloverage {:mvn/version "0.0-41"}}
+                     :extra-paths ["test/src"]}
+
+           :build   {:extra-deps {seancorfield/depstar {:mvn/version "0.5.2"}}
+                     :main-opts  ["--main" "hf.depstar.jar" "target/clj-unifier.jar"]}
+
+           :version {:extra-deps {com.workframe/garamond {:mvn/version "0.4.0"}}
+                     :main-opts  ["--main" "garamond.main"]}
+
+           :install {:extra-deps {deps-deploy {:mvn/version "0.0.9"}}
+                     :main-opts  ["--main" "deps-deploy.deps-deploy" "install" "target/clj-unifier.jar"]}
+
+           :deploy  {:extra-deps {deps-deploy {:mvn/version "0.0.9"}}
+                     :main-opts  ["--main" "deps-deploy.deps-deploy" "deploy" "target/clj-unifier.jar"]}}}
