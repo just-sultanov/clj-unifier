@@ -3,7 +3,7 @@ image:https://codecov.io/gh/just-sultanov/clj-unifier/branch/master/graph/badge.
 image:https://github.com/just-sultanov/clj-unifier/workflows/build/badge.svg[Build]
 image:https://github.com/just-sultanov/clj-unifier/workflows/deploy/badge.svg[Deploy]
 image:https://img.shields.io/clojars/v/clj-unifier.svg[Clojars,link=https://clojars.org/clj-unifier]
-image:https://cljdoc.org/badge/clj-unifier/clj-unifier[cljdoc, link=https://cljdoc.org/d/clj-unifier/clj-unifier/CURRENT]
+image:https://cljdoc.org/badge/clj-unifier/clj-unifier[cljdoc,link=https://cljdoc.org/d/clj-unifier/clj-unifier/CURRENT]
 
 == clj-unifier
 
@@ -23,9 +23,89 @@ Add the following dependency in your project:
 
 ----
 
-=== Examples
+=== Example
 
-You can see full examples link:dev/src/unifier/example.cljc[here].
+[source,clojure]
+----
+(ns example
+  (:require
+    [clojure.string :as str]
+    [unifier.response :as r]))
+
+;; TODO: add example with meta (e.g. i18n)
+
+;;;;
+;; Database layer
+;;;;
+
+(defonce users [{:user/id 1, :user/email "john@doe.com"}
+                {:user/id 2, :user/email "jane@doe.com"}])
+
+
+;;;;
+;; Business logic layer
+;;;;
+
+(def prepare-email (comp str/lower-case str/trim))
+
+(defn get-user-by-email [email]
+  (let [email (prepare-email email)]
+    (if-some [user (->> users
+                     (filter #(= (:user/email %) email))
+                     first)]
+      (r/as-success :ok user)
+      (r/as-error :not-found "user not found"))))
+
+
+
+;;;;
+;; HTTP layer
+;;;;
+
+;; HTTP helpers
+
+(defn with-status [status body]
+  {:status status
+   :body   body})
+
+(defn with-type [type x]
+  (if (vector? type)
+    (update x :type #(->> % (conj type)))
+    (assoc x :type type)))
+
+(defn as-http-response [x]
+  (r/as-response (with-type [:http] x)))
+
+
+;; HTTP wrappers
+
+(defmethod r/as-response [:http :ok] [x]
+  (with-status 200 (r/get-data x)))
+
+(defmethod r/as-response [:http :not-found] [x]
+  (with-status 404 (r/get-data x)))
+
+
+;; HTTP handlers
+
+(defn handler [email]
+  (as-http-response (get-user-by-email email)))
+
+
+
+;;;;
+;; Usage examples
+;;;;
+
+(handler "john@doe.com")
+;; => {:status 200, :body #:user{:id 1, :email "john@doe.com"}}
+
+(handler "jane@doe.com")
+;; => {:status 200, :body #:user{:id 2, :email "jane@doe.com"}}
+
+(handler "andrew@doe.com")
+;;  => {:status 404, :body "user not found"}
+----
 
 === Development
 
