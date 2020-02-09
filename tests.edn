@@ -19,11 +19,7 @@
                                           :kaocha.plugin.alpha/info]
 
      :tests                              [{:id   :clj
-                                           :type :kaocha.type/clojure.test}
-                                          {:id            :cljs
-                                           :type          :kaocha.type/cljs
-                                           :cljs/repl-env cljs.repl.node/repl-env
-                                           :cljs/timeout  60000}]
+                                           :type :kaocha.type/clojure.test}]
 
      :cloverage/opts                     {:output           "target/coverage"
                                           :ns-regex         []

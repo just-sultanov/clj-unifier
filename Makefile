@@ -23,7 +23,7 @@ dev: ## Run REPL
 	@echo "=================================================================="
 	@echo "Run REPL..."
 	@echo "=================================================================="
-	clj -A:test:dev
+	clj -A:test-clj:test-cljs:dev
 
 
 lint: ## Run linter
@@ -34,12 +34,26 @@ lint: ## Run linter
 	@echo -e "\n"
 
 
-test: ## Run tests
+test-cljs: ## Run ClojureScript tests
 	@echo "=================================================================="
-	@echo "Run tests..."
+	@echo "Run ClojureScript tests..."
+	@echo "=================================================================="
+	clojure -A:test-cljs
+	@echo -e "\n"
+
+
+test-clj: ## Run Clojure tests
+	@echo "=================================================================="
+	@echo "Run Clojure tests..."
 	@echo "=================================================================="
 	./bin/kaocha
 	@echo -e "\n"
+
+
+test: test-clj test-cljs ## Run tests
+	@echo "=================================================================="
+	@echo "Run tests..."
+	@echo "=================================================================="
 
 
 jar: ## Build jar
