@@ -157,7 +157,7 @@
     (as-success :user/created \"a user was created successfully\")
 
     * with specified success `type` and `meta`
-    (as-success :user/created \"a user was created successfully\" {:i18/key :user/user/created})"
+    (as-success :user/created \"a user was created successfully\" {:i18/key :user/created})"
   {:added "0.0.3"}
   ([data]
    (as-success @default-success-type data nil))
