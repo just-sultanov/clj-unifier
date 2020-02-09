@@ -1,7 +1,9 @@
-image:https://img.shields.io/github/license/just-sultanov/clj-unifier[License,link=LICENSE]
+image:https://img.shields.io/github/license/just-sultanov/clj-unifier[license,link=LICENSE]
+image:https://codecov.io/gh/just-sultanov/clj-unifier/branch/master/graph/badge.svg[codecov,link=https://codecov.io/gh/just-sultanov/clj-unifier]
 image:https://github.com/just-sultanov/clj-unifier/workflows/build/badge.svg[Build]
 image:https://github.com/just-sultanov/clj-unifier/workflows/deploy/badge.svg[Deploy]
 image:https://img.shields.io/clojars/v/clj-unifier.svg[Clojars,link=https://clojars.org/clj-unifier]
+image:https://cljdoc.org/badge/clj-unifier/clj-unifier[cljdoc, link=https://cljdoc.org/d/clj-unifier/clj-unifier/CURRENT]
 
 == clj-unifier
 
