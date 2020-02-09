@@ -62,4 +62,4 @@ jobs:
         run: make test
 
       - name: Run build
-        run: make build
+        run: make jar

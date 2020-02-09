@@ -111,7 +111,7 @@ jobs:
       - name: Run clean
         run: make clean
 
-      - name: Run jar build
+      - name: Run build
         run: make jar
 
       - name: Run deploy
