@@ -15,6 +15,7 @@
 (defonce users [user1 user2])
 
 
+
 ;;;;
 ;; Business logic layer
 ;;;;
@@ -70,7 +71,47 @@
 ;; Test cases
 ;;;;
 
-(deftest handler-test
+;; Test helpers
+
+(defn same? [type data meta x]
+  (and
+    (= type (sut/get-type x))
+    (= data (sut/get-data x))
+    (= meta (sut/get-meta x))
+    true))
+
+(defn calc [x]
+  (if-not (sut/response? x)
+    (sut/as-success (inc x))
+    (update x :data inc)))
+
+(defn boom! [x]
+  (sut/as-error :error "boom!" (sut/get-data x)))
+
+
+;; Tests
+
+(deftest business-logic-test
+  (let [res1 (get-user-by-email "john@doe.com")
+        res2 (get-user-by-email "jane@doe.com")
+        res3 (get-user-by-email "andrew@doe.com")]
+    (is (sut/response? res1))
+    (is (sut/success? res1))
+    (is (not (sut/error? res1)))
+    (is (same? :ok user1 nil res1))
+
+    (is (sut/response? res2))
+    (is (sut/success? res2))
+    (is (not (sut/error? res2)))
+    (is (same? :ok user2 nil res2))
+
+    (is (sut/response? res3))
+    (is (not (sut/success? res3)))
+    (is (sut/error? res3))
+    (is (same? :not-found "user not found" nil res3))))
+
+
+(deftest http-layer-test
   (let [res1 (handler "john@doe.com")
         res2 (handler "jane@doe.com")
         res3 (handler "andrew@doe.com")]
@@ -79,27 +120,27 @@
     (is (= {:status 404, :body "user not found"} res3))))
 
 
-(deftest response-test
-  (let [res1 (get-user-by-email "john@doe.com")
-        res2 (get-user-by-email "jane@doe.com")
-        res3 (get-user-by-email "andrew@doe.com")]
-    (is (true? (sut/response? res1)))
-    (is (true? (sut/success? res1)))
-    (is (false? (sut/error? res1)))
-    (is (= :ok (sut/get-type res1)))
-    (is (= user1 (sut/get-data res1)))
-    (is (nil? (sut/get-meta res1)))
+(deftest tread-first-macro-test
+  (let [res1 (sut/-> 42 boom!)
+        res2 (sut/-> 42 calc calc)
+        res3 (sut/-> 42 calc boom! calc)
+        res4 (sut/-> 42 calc calc boom! calc)
+        res5 (sut/-> 42 calc calc calc calc boom!)]
+    (is (same? :error "boom!" 42 res1))
+    (is (same? :success 44 nil res2))
+    (is (same? :error "boom!" 43 res3))
+    (is (same? :error "boom!" 44 res4))
+    (is (same? :error "boom!" 46 res5))))
 
-    (is (true? (sut/response? res2)))
-    (is (true? (sut/success? res2)))
-    (is (false? (sut/error? res2)))
-    (is (= :ok (sut/get-type res2)))
-    (is (= user2 (sut/get-data res2)))
-    (is (nil? (sut/get-meta res2)))
 
-    (is (true? (sut/response? res3)))
-    (is (false? (sut/success? res3)))
-    (is (true? (sut/error? res3)))
-    (is (= :not-found (sut/get-type res3)))
-    (is (= "user not found" (sut/get-data res3)))
-    (is (nil? (sut/get-meta res3)))))
+(deftest tread-last-macro-test
+  (let [res1 (sut/->> 42 boom!)
+        res2 (sut/->> 42 calc calc)
+        res3 (sut/->> 42 calc boom! calc)
+        res4 (sut/->> 42 calc calc boom! calc)
+        res5 (sut/->> 42 calc calc calc calc boom!)]
+    (is (same? :error "boom!" 42 res1))
+    (is (same? :success 44 nil res2))
+    (is (same? :error "boom!" 43 res3))
+    (is (same? :error "boom!" 44 res4))
+    (is (same? :error "boom!" 46 res5))))

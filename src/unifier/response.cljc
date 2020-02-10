@@ -1,4 +1,7 @@
-(ns unifier.response)
+(ns unifier.response
+  #?(:clj (:refer-clojure :exclude [-> ->>]))
+  #?(:clj  (:require [clojure.core :as c])
+     :cljs (:require-macros unifier.response)))
 
 ;;;;
 ;; Defaults
@@ -45,16 +48,37 @@
   (-get-meta [_]
     "Returns `meta` of response."))
 
-;; Extends all objects for compatibility.
+;; Extends `nil`, `Object` and `default` for compatibility.
 ;; Returns `false` for all `IUnifiedResponse` protocol predicates and identity for `get-data`
+
 (extend-protocol IUnifiedResponse
-  #?(:clj Object :cljs js/Object)
+  nil
   (-response? [_] false)
   (-error? [_] false)
   (-success? [_] false)
   (-get-type [_] nil)
   (-get-data [_] _)
   (-get-meta [_] nil))
+
+#?(:clj
+   (extend-protocol IUnifiedResponse
+     Object
+     (-response? [_] false)
+     (-error? [_] false)
+     (-success? [_] false)
+     (-get-type [_] nil)
+     (-get-data [_] _)
+     (-get-meta [_] nil))
+
+   :cljs
+   (extend-protocol IUnifiedResponse
+     default
+     (-response? [_] false)
+     (-error? [_] false)
+     (-success? [_] false)
+     (-get-type [_] nil)
+     (-get-data [_] _)
+     (-get-meta [_] nil)))
 
 
 
@@ -179,3 +203,45 @@
 ;; Returns identity by default
 (defmethod as-response :default [x] x)
 (defmethod as-response nil [x] x)
+
+
+
+;;;;
+;; Pipeline builders
+;;;;
+
+#?(:clj
+   (defmacro ->
+     "This macro is the same as `clojure.core/some->`, but the check is done
+     using the predicate `error?` of the `IUnifiedResponse` protocol and
+     the substitution occurs as in macro `->` (the `thread-first` macro)."
+     {:added "0.0.5"}
+     [expr & forms]
+     (let [g     (gensym)
+           steps (map (fn [step]
+                        `(let [g# ~g]
+                           (if (error? g#) g# (c/-> g# ~step))))
+                   forms)]
+       `(let [~g ~expr
+              ~@(interleave (repeat g) (butlast steps))]
+          ~(if (empty? steps)
+             g
+             (last steps))))))
+
+#?(:clj
+   (defmacro ->>
+     "This macro is the same as `clojure.core/some->`, but the check is done
+     using the predicate `error?` of the `IUnifiedResponse` protocol and
+     the substitution occurs as in macro `->>` (the `thread-last` macro)."
+     {:added "0.0.5"}
+     [expr & forms]
+     (let [g     (gensym)
+           steps (map (fn [step]
+                        `(let [g# ~g]
+                           (if (error? g#) g# (c/->> g# ~step))))
+                   forms)]
+       `(let [~g ~expr
+              ~@(interleave (repeat g) (butlast steps))]
+          ~(if (empty? steps)
+             g
+             (last steps))))))
