@@ -120,7 +120,7 @@
     (is (= {:status 404, :body "user not found"} res3))))
 
 
-(deftest tread-first-macro-test
+(deftest thread-first-macro-test
   (let [res1 (sut/-> 42 boom!)
         res2 (sut/-> 42 calc calc)
         res3 (sut/-> 42 calc boom! calc)
@@ -133,7 +133,7 @@
     (is (same? :error "boom!" 46 res5))))
 
 
-(deftest tread-last-macro-test
+(deftest thread-last-macro-test
   (let [res1 (sut/->> 42 boom!)
         res2 (sut/->> 42 calc calc)
         res3 (sut/->> 42 calc boom! calc)
