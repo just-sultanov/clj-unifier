@@ -1,5 +1,9 @@
 == Changelog
 
+=== v0.0.5
+
+* Added `->` ("thread-first") and `->>` ("thread-last") macros
+
 === v0.0.4
 
 * Added docstrings
