@@ -18,8 +18,9 @@
                                           :kaocha.plugin/notifier
                                           :kaocha.plugin.alpha/info]
 
-     :tests                              [{:id   :clj
-                                           :type :kaocha.type/clojure.test}]
+     :tests                              [{:id           :unit
+                                           :source-paths ["src"]
+                                           :test-paths   ["test/src"]}]
 
      :cloverage/opts                     {:output           "target/coverage"
                                           :ns-regex         []

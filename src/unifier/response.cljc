@@ -138,7 +138,7 @@
     (as-error :user/not-found \"a user was not found\")
 
     * with specified error `type` and `meta`
-    (as-error :user/not-found \"john@doe.com\" {:i18/key :user/not-found})"
+    (as-error :user/not-found \"john@doe.com\" {:i18n/key :user/not-found})"
   {:added "0.0.3"}
   ([data]
    (as-error @default-error-type data nil))

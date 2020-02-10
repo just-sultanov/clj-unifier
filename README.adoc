@@ -1,8 +1,8 @@
 image:https://img.shields.io/github/license/just-sultanov/clj-unifier[license,link=LICENSE]
 image:https://codecov.io/gh/just-sultanov/clj-unifier/branch/master/graph/badge.svg[codecov,link=https://codecov.io/gh/just-sultanov/clj-unifier]
-image:https://github.com/just-sultanov/clj-unifier/workflows/build/badge.svg[Build]
-image:https://github.com/just-sultanov/clj-unifier/workflows/deploy/badge.svg[Deploy]
-image:https://img.shields.io/clojars/v/clj-unifier.svg[Clojars,link=https://clojars.org/clj-unifier]
+image:https://github.com/just-sultanov/clj-unifier/workflows/build/badge.svg[build]
+image:https://github.com/just-sultanov/clj-unifier/workflows/deploy/badge.svg[deploy]
+image:https://img.shields.io/clojars/v/clj-unifier.svg[clojars,link=https://clojars.org/clj-unifier]
 image:https://cljdoc.org/badge/clj-unifier/clj-unifier[cljdoc,link=https://cljdoc.org/d/clj-unifier/clj-unifier/CURRENT]
 
 == clj-unifier
@@ -119,8 +119,14 @@ $ make dev
 
 [source,bash]
 ----
-# Run tests
+# Run all tests
 $ make test
+
+# Run Clojure tests
+$ make test-clj
+
+# Run ClojureScript tests
+$ make test-cljs
 ----
 
 === Deploy
@@ -143,6 +149,8 @@ help                           Show help
 clean                          Clean
 dev                            Run REPL
 lint                           Run linter
+test-cljs                      Run ClojureScript tests
+test-clj                       Run Clojure tests
 test                           Run tests
 jar                            Build jar
 install                        Install locally
