@@ -1,4 +1,5 @@
 (ns unifier.response
+  "A Clojure(Script) library for unified responses."
   #?(:clj (:refer-clojure :exclude [-> ->>]))
   #?(:clj  (:require [clojure.core :as c])
      :cljs (:require-macros unifier.response)))
@@ -7,13 +8,23 @@
 ;; Defaults
 ;;;;
 
-(defonce ^{:added "0.0.3" :doc "Default error `type`."}
+(defonce
+  ^{:doc   "Default error `type`."
+    :added "0.0.3"}
   default-error-type
-  (atom :error))
+  (atom ::error))
 
-(defonce ^{:added "0.0.3" :doc "Default success `type`."}
+(defonce
+  ^{:doc   "Default exception `type`."
+    :added "0.0.6"}
+  default-exception-type
+  (atom ::exception))
+
+(defonce
+  ^{:doc   "Default success `type`."
+    :added "0.0.3"}
   default-success-type
-  (atom :success))
+  (atom ::success))
 
 
 (defn set-default-error-type!
@@ -21,6 +32,12 @@
   {:added "0.0.3"}
   [type]
   (reset! default-error-type type))
+
+(defn set-default-exception-type!
+  "Overrides default exception `type`."
+  {:added "0.0.6"}
+  [type]
+  (reset! default-exception-type type))
 
 (defn set-default-success-type!
   "Overrides default success `type`."
@@ -207,41 +224,81 @@
 
 
 ;;;;
+;; Macros helpers
+;;;;
+
+#?(:clj
+   (do
+     (defn cljs?
+       "Checks &env in macro and returns `true` if that cljs env. Otherwise `false`."
+       {:added "0.0.6"}
+       [env]
+       (boolean (:ns env)))
+
+     (defmacro safe
+       "Extended version of try-catch."
+       {:added "0.0.6"}
+       ([body]
+        `(safe ~body nil))
+
+       ([body handler]
+        `(try
+           ~body
+           (catch ~(if-not (cljs? &env) 'Throwable :default) error#
+             (when-some [handler# ~handler]
+               (handler# error#))))))))
+
+
+
+;;;;
 ;; Pipeline builders
 ;;;;
 
 #?(:clj
-   (defmacro ->
-     "This macro is the same as `clojure.core/some->`, but the check is done
-     using the predicate `error?` of the `IUnifiedResponse` protocol and
-     the substitution occurs as in macro `->` (the `thread-first` macro)."
-     {:added "0.0.5"}
-     [expr & forms]
-     (let [g     (gensym)
-           steps (map (fn [step]
-                        `(let [g# ~g]
-                           (if (error? g#) g# (c/-> g# ~step))))
-                   forms)]
-       `(let [~g ~expr
-              ~@(interleave (repeat g) (butlast steps))]
-          ~(if (empty? steps)
-             g
-             (last steps))))))
+   (do
+     (defmacro ->
+       "This macro is the same as `clojure.core/some->`, but the check is done
+       using the predicate `error?` of the `IUnifiedResponse` protocol and
+       the substitution occurs as in macro `->` (the `thread-first` macro)."
+       {:added "0.0.5"}
+       [expr & forms]
+       (let [g     (gensym)
+             steps (map (fn [step]
+                          `(let [g# ~g]
+                             (if (error? g#) g# (c/-> g# ~step))))
+                     forms)]
+         `(let [~g ~expr
+                ~@(interleave (repeat g) (butlast steps))]
+            ~(if (empty? steps)
+               g
+               (last steps)))))
 
-#?(:clj
-   (defmacro ->>
-     "This macro is the same as `clojure.core/some->`, but the check is done
-     using the predicate `error?` of the `IUnifiedResponse` protocol and
-     the substitution occurs as in macro `->>` (the `thread-last` macro)."
-     {:added "0.0.5"}
-     [expr & forms]
-     (let [g     (gensym)
-           steps (map (fn [step]
-                        `(let [g# ~g]
-                           (if (error? g#) g# (c/->> g# ~step))))
-                   forms)]
-       `(let [~g ~expr
-              ~@(interleave (repeat g) (butlast steps))]
-          ~(if (empty? steps)
-             g
-             (last steps))))))
+     (defmacro ?->
+       "The safe version of the macro `->` (the `thread-first` macro)."
+       {:added "0.0.6"}
+       [& forms]
+       `(safe (-> ~@forms) #(as-error @default-exception-type %)))
+
+
+     (defmacro ->>
+       "This macro is the same as `clojure.core/some->`, but the check is done
+       using the predicate `error?` of the `IUnifiedResponse` protocol and
+       the substitution occurs as in macro `->>` (the `thread-last` macro)."
+       {:added "0.0.5"}
+       [expr & forms]
+       (let [g     (gensym)
+             steps (map (fn [step]
+                          `(let [g# ~g]
+                             (if (error? g#) g# (c/->> g# ~step))))
+                     forms)]
+         `(let [~g ~expr
+                ~@(interleave (repeat g) (butlast steps))]
+            ~(if (empty? steps)
+               g
+               (last steps)))))
+
+     (defmacro ?->>
+       "The safe version of the macro `->>` (the `thread-last` macro)."
+       {:added "0.0.6"}
+       [& forms]
+       `(safe (->> ~@forms) #(as-error @default-exception-type %)))))

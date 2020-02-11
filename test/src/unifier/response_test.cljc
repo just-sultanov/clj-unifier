@@ -73,6 +73,11 @@
 
 ;; Test helpers
 
+(defn reset-defaults! []
+  (sut/set-default-error-type! ::sut/error)
+  (sut/set-default-exception-type! ::sut/exception)
+  (sut/set-default-success-type! ::sut/success))
+
 (defn same? [type data meta x]
   (and
     (= type (sut/get-type x))
@@ -86,10 +91,47 @@
     (update x :data inc)))
 
 (defn boom! [x]
-  (sut/as-error :error "boom!" (sut/get-data x)))
+  (sut/as-error ::sut/error "boom!" (sut/get-data x)))
+
+(defn throw! [& _]
+  #?(:clj  (throw (IllegalArgumentException. "boom!"))
+     :cljs (throw (js/Error. "boom!"))))
 
 
 ;; Tests
+
+(deftest defaults-overrides-test
+  (reset-defaults!)
+
+  (let [error ::error]
+    (is (= ::sut/error (sut/get-type (sut/as-error "boom!"))))
+    (sut/set-default-error-type! error)
+    (is (= error (sut/get-type (sut/as-error "boom!")))))
+
+  (let [exception ::exception]
+    (is (= ::sut/exception (sut/get-type (sut/?-> (throw!)))))
+    (sut/set-default-exception-type! exception)
+    (is (= exception (sut/get-type (sut/?->> (throw!))))))
+
+  (let [success ::success]
+    (is (= ::sut/success (sut/get-type (sut/as-success "done!"))))
+    (sut/set-default-success-type! success)
+    (is (= success (sut/get-type (sut/as-success "done!")))))
+
+  (reset-defaults!))
+
+
+(deftest objects-test
+  (let [objects [nil true false 1 \1 "1" 'symbol :keyword ::keyword
+                 #?(:clj (Object.) :cljs (js/Object.))]]
+    (doseq [o objects]
+      (is (false? (sut/response? o)))
+      (is (false? (sut/error? o)))
+      (is (false? (sut/success? o)))
+      (is (nil? (sut/get-type o)))
+      (is (= o (sut/get-data o)))
+      (is (nil? (sut/get-meta o))))))
+
 
 (deftest business-logic-test
   (let [res1 (get-user-by-email "john@doe.com")
@@ -120,17 +162,38 @@
     (is (= {:status 404, :body "user not found"} res3))))
 
 
+(deftest safe-test
+  #?(:clj
+     (do
+       (is (nil? (sut/safe (throw (IllegalArgumentException. "boom!")))))
+       (is (sut/error? (sut/safe (throw (IllegalArgumentException. "boom!")) sut/as-error))))
+
+     :cljs
+     (do
+       (is (nil? (sut/safe (throw (js/Error. "boom!")))))
+       (is (sut/error? (sut/safe (throw (js/Error. "boom!")) sut/as-error))))))
+
+
 (deftest thread-first-macro-test
   (let [res1 (sut/-> 42 boom!)
         res2 (sut/-> 42 calc calc)
         res3 (sut/-> 42 calc boom! calc)
         res4 (sut/-> 42 calc calc boom! calc)
         res5 (sut/-> 42 calc calc calc calc boom!)]
-    (is (same? :error "boom!" 42 res1))
-    (is (same? :success 44 nil res2))
-    (is (same? :error "boom!" 43 res3))
-    (is (same? :error "boom!" 44 res4))
-    (is (same? :error "boom!" 46 res5))))
+    (is (same? ::sut/error "boom!" 42 res1))
+    (is (same? ::sut/success 44 nil res2))
+    (is (same? ::sut/error "boom!" 43 res3))
+    (is (same? ::sut/error "boom!" 44 res4))
+    (is (same? ::sut/error "boom!" 46 res5))))
+
+
+(deftest safe-thread-first-macro-test
+  (let [res1 (sut/?-> 42 calc calc boom! calc)
+        res2 (sut/?-> 42 calc throw! calc boom! calc)
+        res3 (sut/?-> 42 calc calc calc)]
+    (is (= ::sut/error (sut/get-type res1)))
+    (is (= ::sut/exception (sut/get-type res2)))
+    (is (= ::sut/success (sut/get-type res3)))))
 
 
 (deftest thread-last-macro-test
@@ -139,8 +202,17 @@
         res3 (sut/->> 42 calc boom! calc)
         res4 (sut/->> 42 calc calc boom! calc)
         res5 (sut/->> 42 calc calc calc calc boom!)]
-    (is (same? :error "boom!" 42 res1))
-    (is (same? :success 44 nil res2))
-    (is (same? :error "boom!" 43 res3))
-    (is (same? :error "boom!" 44 res4))
-    (is (same? :error "boom!" 46 res5))))
+    (is (same? ::sut/error "boom!" 42 res1))
+    (is (same? ::sut/success 44 nil res2))
+    (is (same? ::sut/error "boom!" 43 res3))
+    (is (same? ::sut/error "boom!" 44 res4))
+    (is (same? ::sut/error "boom!" 46 res5))))
+
+
+(deftest safe-thread-last-macro-test
+  (let [res1 (sut/?->> 42 calc calc boom! calc)
+        res2 (sut/?->> 42 calc throw! calc boom! calc)
+        res3 (sut/?->> 42 calc calc calc)]
+    (is (= ::sut/error (sut/get-type res1)))
+    (is (= ::sut/exception (sut/get-type res2)))
+    (is (= ::sut/success (sut/get-type res3)))))
