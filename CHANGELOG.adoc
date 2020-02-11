@@ -1,5 +1,9 @@
 == Changelog
 
+=== v0.0.6
+
+* Added safe macros versions of `?->` ("safe-thread-first") and `?->>` ("safe-thread-last")
+
 === v0.0.5
 
 * Added `->` ("thread-first") and `->>` ("thread-last") macros
