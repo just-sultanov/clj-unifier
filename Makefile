@@ -19,18 +19,18 @@ clean: ## Clean
 	@echo -e "\n"
 
 
-dev: ## Run REPL
+repl: ## Run REPL
 	@echo "=================================================================="
 	@echo "Run REPL..."
 	@echo "=================================================================="
-	clj -A:test-clj:test-cljs:dev
+	clj -A:common:test-clj:test-cljs:repl
 
 
 lint: ## Run linter
 	@echo "=================================================================="
 	@echo "Run linter..."
 	@echo "=================================================================="
-	clj-kondo --lint src:test/src
+	clj-kondo --lint src:test/src:dev/src
 	@echo -e "\n"
 
 
@@ -38,7 +38,7 @@ test-cljs: ## Run ClojureScript tests
 	@echo "=================================================================="
 	@echo "Run ClojureScript tests..."
 	@echo "=================================================================="
-	clojure -A:test-cljs
+	clojure -A:common:test-cljs
 	@echo -e "\n"
 
 
@@ -92,6 +92,22 @@ minor: ## Increment minor version
 
 major: ## Increment major version
 	clojure -A:version major --tag --message ${TAG_MSG}
+
+
+minor-rc: ## Increment minor-rc version
+	clojure -A:version minor-rc --tag --message ${TAG_MSG}
+
+
+major-rc: ## Increment major-rc version
+	clojure -A:version major-rc --tag --message ${TAG_MSG}
+
+
+minor-release: ## Increment minor-release version
+	clojure -A:version minor-release --tag --message ${TAG_MSG}
+
+
+major-release: ## Increment major-release version
+	clojure -A:version major-release --tag --message ${TAG_MSG}
 
 
 release: ## Release a new version

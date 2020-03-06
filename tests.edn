@@ -19,7 +19,7 @@
                                           :kaocha.plugin.alpha/info]
 
      :tests                              [{:id           :unit
-                                           :source-paths ["src"]
+                                           :source-paths ["src" "examples/src"]
                                            :test-paths   ["test/src"]}]
 
      :cloverage/opts                     {:output           "target/coverage"
