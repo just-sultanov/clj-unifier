@@ -180,7 +180,7 @@
 (def ^{:added "0.0.7"}
   success-types
   "Common `success` types."
-  #{::ok ::success ::created ::accepted})
+  #{::ok ::success ::created ::deleted ::accepted})
 
 
 (defn as-success
@@ -207,13 +207,23 @@
 
 
 (defn as-created
-  "Returns unified `::accepted` response."
+  "Returns unified `::created` response."
   {:added "0.0.7"}
   ([data]
    (as-created data nil))
 
   ([data meta]
    (as-success ::created data meta)))
+
+
+(defn as-deleted
+  "Returns unified `::deleted` response."
+  {:added "0.0.9"}
+  ([data]
+   (as-deleted data nil))
+
+  ([data meta]
+   (as-success ::deleted data meta)))
 
 
 (defn as-accepted
@@ -235,7 +245,7 @@
   error-types
   "Common `error` types."
   #{::error ::exception ::unknown ::warning ::unavailable ::interrupted ::incorrect
-    ::forbidden ::unsupported ::not-found ::conflict ::fault ::busy})
+    ::unauthorized ::forbidden ::unsupported ::not-found ::conflict ::fault ::busy})
 
 
 (defn as-error
@@ -309,6 +319,16 @@
 
   ([data meta]
    (as-error ::incorrect data meta)))
+
+
+(defn as-unauthorized
+  "Returns unified `::unauthorized` response."
+  {:added "0.0.9"}
+  ([data]
+   (as-unauthorized data nil))
+
+  ([data meta]
+   (as-error ::unauthorized data meta)))
 
 
 (defn as-forbidden

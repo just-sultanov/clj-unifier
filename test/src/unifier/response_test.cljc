@@ -52,6 +52,7 @@
       (is (same? ::sut/ok data meta (sut/as-ok data)))
       (is (same? ::sut/success data meta (sut/as-success data)))
       (is (same? ::sut/created data meta (sut/as-created data)))
+      (is (same? ::sut/deleted data meta (sut/as-deleted data)))
       (is (same? ::sut/accepted data meta (sut/as-accepted data)))
 
       (is (same? ::sut/error data meta (sut/as-error data)))
@@ -61,6 +62,7 @@
       (is (same? ::sut/unavailable data meta (sut/as-unavailable data)))
       (is (same? ::sut/interrupted data meta (sut/as-interrupted data)))
       (is (same? ::sut/incorrect data meta (sut/as-incorrect data)))
+      (is (same? ::sut/unauthorized data meta (sut/as-unauthorized data)))
       (is (same? ::sut/forbidden data meta (sut/as-forbidden data)))
       (is (same? ::sut/unsupported data meta (sut/as-unsupported data)))
       (is (same? ::sut/not-found data meta (sut/as-not-found data)))
@@ -74,6 +76,7 @@
       (is (same? ::sut/ok data meta (sut/as-ok data meta)))
       (is (same? ::sut/success data meta (sut/as-success data meta)))
       (is (same? ::sut/created data meta (sut/as-created data meta)))
+      (is (same? ::sut/deleted data meta (sut/as-deleted data meta)))
       (is (same? ::sut/accepted data meta (sut/as-accepted data meta)))
 
       (is (same? ::sut/error data meta (sut/as-error data meta)))
@@ -83,6 +86,7 @@
       (is (same? ::sut/unavailable data meta (sut/as-unavailable data meta)))
       (is (same? ::sut/interrupted data meta (sut/as-interrupted data meta)))
       (is (same? ::sut/incorrect data meta (sut/as-incorrect data meta)))
+      (is (same? ::sut/unauthorized data meta (sut/as-unauthorized data meta)))
       (is (same? ::sut/forbidden data meta (sut/as-forbidden data meta)))
       (is (same? ::sut/unsupported data meta (sut/as-unsupported data meta)))
       (is (same? ::sut/not-found data meta (sut/as-not-found data meta)))
