@@ -15,19 +15,19 @@
 
 (defmethod execute [:v1 :users/get-all]
   [_]
-  (user.service/get-users))
+  (user.service/get-all))
 
 
 (defmethod execute [:v1 :user/get]
   [{:cmd/keys [context]}]
-  (user.service/get-user (:user/email context)))
+  (user.service/get (:user/email context)))
 
 
 (defmethod execute [:v1 :user/create]
   [{:cmd/keys [context]}]
-  (user.service/create-user (:user/email context)))
+  (user.service/create (:user/email context)))
 
 
 (defmethod execute [:v1 :user/delete]
   [{:cmd/keys [context]}]
-  (user.service/delete-user (:user/email context)))
+  (user.service/delete (:user/email context)))
