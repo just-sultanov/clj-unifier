@@ -3,8 +3,7 @@
    [unifier.response :as r]
    [unifier.response.http :as http]
    [example.i18n :as i18n]
-   [example.api :as api]
-   [unifier.response :as sut]))
+   [example.api :as api]))
 
 ;;;;
 ;; API router
@@ -32,7 +31,7 @@
 
 ;; TODO: use derive?
 (def response-types
-  {::sut/unsupported ::http/not-implemented
+  {::r/unsupported ::http/not-implemented
    :user/found       ::http/ok
    :user/not-found   ::http/not-found
    :users/found      ::http/ok
@@ -65,7 +64,7 @@
   (let [type          (r/get-type res)
         response-type (get response-types type)]
     {:status (http/to-status response-type)
-     :body   (sut/unwrap res)}))
+     :body   (r/unwrap res)}))
 
 
 
