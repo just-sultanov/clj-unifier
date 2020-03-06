@@ -1,5 +1,9 @@
 == Changelog
 
+=== v0.0.8
+
+* Updated docstrings
+
 === v0.0.7
 
 * Added unified response helpers, setters and builders
