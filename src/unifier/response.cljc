@@ -246,7 +246,7 @@
 (def ^{:added "0.0.7"}
   error-types
   "Common `error` types."
-  #{::warning ::error ::exception ::unavailable ::interrupted ::incorrect
+  #{::error ::exception ::unknown ::warning ::unavailable ::interrupted ::incorrect
     ::forbidden ::unsupported ::not-found ::conflict ::fault ::busy})
 
 
@@ -281,6 +281,17 @@
 
   ([data meta]
    (as-error ::exception data meta)))
+
+
+(defn as-unknown
+  "Returns unified `::unknown` response.
+  Instance of `unifier.response/UnifiedError`."
+  {:added "0.0.7"}
+  ([data]
+   (as-unknown data nil))
+
+  ([data meta]
+   (as-error ::unknown data meta)))
 
 
 (defn as-warning
