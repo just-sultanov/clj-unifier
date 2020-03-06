@@ -1,5 +1,11 @@
 == Changelog
 
+=== v0.0.7
+
+* Added unified response helpers, setters and builders
+* Added unified http responses
+* Added full example
+
 === v0.0.6
 
 * Added safe macros versions of `?->` ("safe-thread-first") and `?->>` ("safe-thread-last")
