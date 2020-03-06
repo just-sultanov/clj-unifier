@@ -3,7 +3,8 @@
    [unifier.response :as r]
    [unifier.response.http :as http]
    [example.i18n :as i18n]
-   [example.api :as api]))
+   [example.api :as api]
+   [unifier.response :as sut]))
 
 ;;;;
 ;; API router
@@ -14,9 +15,9 @@
     [version method]))
 
 
-(defmethod invoke :default [_]
-  {:status 501
-   :body   "not implemented"}) ;; TODO: change to unifier.response.http
+(defmethod invoke :default
+  [{:as req :api/keys [method]}]
+  (r/as-unsupported req {:i18n/key ::unsupported :i18n/params method}))
 
 
 (defmethod invoke [:v1 :cmd/execute]
@@ -31,7 +32,8 @@
 
 ;; TODO: use derive?
 (def response-types
-  {:user/found       ::http/ok
+  {::sut/unsupported ::http/not-implemented
+   :user/found       ::http/ok
    :user/not-found   ::http/not-found
    :users/found      ::http/ok
    :user/created     ::http/created
@@ -63,7 +65,8 @@
   (let [type          (r/get-type res)
         response-type (get response-types type)]
     {:status (http/to-status response-type)
-     :body   res}))
+     :body   (sut/unwrap res)}))
+
 
 
 (defn- transform [opts]

@@ -9,8 +9,8 @@
 
 
 (defmethod execute :default
-  [cmd]
-  (r/as-error :unknown cmd)) ;; TODO: add i18n meta data
+  [{:as cmd :cmd/keys [name]}]
+  (r/as-unsupported cmd {:i18n/key ::unsupported :i18n/params name}))
 
 
 (defmethod execute [:v1 :users/get-all]
