@@ -184,16 +184,7 @@
 
 
 (defn as-success
-  "Returns instance of `unifier.response/UnifiedSuccess`.
-  Examples:
-    * with default success `type`
-    (as-success \"a user was created successfully\")
-
-    * with specified success `type`
-    (as-success :user/created \"a user was created successfully\")
-
-    * with specified success `type` and `meta`
-    (as-success :user/created \"a user was created successfully\" {:i18n/key :user/created})"
+  "Returns unified `::success` response."
   {:added "0.0.3"}
   ([data]
    (as-success ::success data nil))
@@ -206,8 +197,7 @@
 
 
 (defn as-ok
-  "Returns unified `::ok` response.
-  Instance of `unifier.response/UnifiedSuccess`."
+  "Returns unified `::ok` response."
   {:added "0.0.7"}
   ([data]
    (as-ok data nil))
@@ -217,8 +207,7 @@
 
 
 (defn as-created
-  "Returns unified `::accepted` response.
-  Instance of `unifier.response/UnifiedSuccess`."
+  "Returns unified `::accepted` response."
   {:added "0.0.7"}
   ([data]
    (as-created data nil))
@@ -228,8 +217,7 @@
 
 
 (defn as-accepted
-  "Returns unified `::accepted` response.
-  Instance of `unifier.response/UnifiedSuccess`."
+  "Returns unified `::accepted` response."
   {:added "0.0.7"}
   ([data]
    (as-accepted data nil))
@@ -251,16 +239,7 @@
 
 
 (defn as-error
-  "Returns unified `::error` response. Instance of `unifier.response/UnifiedError`.
-  Examples:
-    * with default error `type`
-    (as-error \"a user was not found\")
-
-    * with specified error `type`
-    (as-error :user/not-found \"a user was not found\")
-
-    * with specified error `type` and `meta`
-    (as-error :user/not-found \"john@doe.com\" {:i18n/key :user/not-found})"
+  "Returns unified `::error` response."
   {:added "0.0.3"}
   ([data]
    (as-error ::error data nil))
@@ -273,8 +252,7 @@
 
 
 (defn as-exception
-  "Returns unified `::exception` response.
-  Instance of `unifier.response/UnifiedError`."
+  "Returns unified `::exception` response."
   {:added "0.0.7"}
   ([data]
    (as-exception data nil))
@@ -284,8 +262,7 @@
 
 
 (defn as-unknown
-  "Returns unified `::unknown` response.
-  Instance of `unifier.response/UnifiedError`."
+  "Returns unified `::unknown` response."
   {:added "0.0.7"}
   ([data]
    (as-unknown data nil))
@@ -295,8 +272,7 @@
 
 
 (defn as-warning
-  "Returns unified `::warning` response.
-  Instance of `unifier.response/UnifiedError`."
+  "Returns unified `::warning` response."
   {:added "0.0.7"}
   ([data]
    (as-warning data nil))
@@ -306,8 +282,7 @@
 
 
 (defn as-unavailable
-  "Returns unified `::unavailable` response.
-  Instance of `unifier.response/UnifiedError`."
+  "Returns unified `::unavailable` response."
   {:added "0.0.7"}
   ([data]
    (as-unavailable data nil))
@@ -317,8 +292,7 @@
 
 
 (defn as-interrupted
-  "Returns unified `::interrupted` response.
-  Instance of `unifier.response/UnifiedError`."
+  "Returns unified `::interrupted` response."
   {:added "0.0.7"}
   ([data]
    (as-interrupted data nil))
@@ -328,8 +302,7 @@
 
 
 (defn as-incorrect
-  "Returns unified `::incorrect` response.
-  Instance of `unifier.response/UnifiedError`."
+  "Returns unified `::incorrect` response."
   {:added "0.0.7"}
   ([data]
    (as-incorrect data nil))
@@ -339,8 +312,7 @@
 
 
 (defn as-forbidden
-  "Returns unified `::forbidden` response.
-  Instance of `unifier.response/UnifiedError`."
+  "Returns unified `::forbidden` response."
   {:added "0.0.7"}
   ([data]
    (as-forbidden data nil))
@@ -350,8 +322,7 @@
 
 
 (defn as-unsupported
-  "Returns unified `::unsupported` response.
-  Instance of `unifier.response/UnifiedError`."
+  "Returns unified `::unsupported` response."
   {:added "0.0.7"}
   ([data]
    (as-unsupported data nil))
@@ -361,8 +332,7 @@
 
 
 (defn as-not-found
-  "Returns unified `::not-found` response.
-  Instance of `unifier.response/UnifiedError`."
+  "Returns unified `::not-found` response."
   {:added "0.0.7"}
   ([data]
    (as-not-found data nil))
@@ -372,8 +342,7 @@
 
 
 (defn as-conflict
-  "Returns unified `::conflict` response.
-  Instance of `unifier.response/UnifiedError`."
+  "Returns unified `::conflict` response."
   {:added "0.0.7"}
   ([data]
    (as-conflict data nil))
@@ -383,8 +352,7 @@
 
 
 (defn as-fault
-  "Returns unified `::fault` response.
-  Instance of `unifier.response/UnifiedError`."
+  "Returns unified `::fault` response."
   {:added "0.0.7"}
   ([data]
    (as-fault data nil))
@@ -394,8 +362,7 @@
 
 
 (defn as-busy
-  "Returns unified `::busy` response.
-  Instance of `unifier.response/UnifiedError`."
+  "Returns unified `::busy` response."
   {:added "0.0.7"}
   ([data]
    (as-busy data nil))
