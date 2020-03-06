@@ -1,82 +1,12 @@
 (ns unifier.response-test
   (:require
-    #?(:clj  [clojure.test :refer [deftest is]]
-       :cljs [cljs.test :refer-macros [deftest is]])
-    [clojure.string :as str]
-    [unifier.response :as sut]))
+   #?(:clj  [clojure.test :refer [deftest testing is]]
+      :cljs [cljs.test :refer-macros [deftest testing is]])
+   [unifier.response :as sut]))
 
 ;;;;
-;; Database layer
-;;;;
-
-(def user1 {:user/id 1, :user/email "john@doe.com"})
-(def user2 {:user/id 2, :user/email "jane@doe.com"})
-
-(defonce users [user1 user2])
-
-
-
-;;;;
-;; Business logic layer
-;;;;
-
-(def prepare-email (comp str/lower-case str/trim))
-
-(defn get-user-by-email [email]
-  (let [email (prepare-email email)]
-    (if-some [user (->> users
-                     (filter #(= (:user/email %) email))
-                     first)]
-      (sut/as-success :ok user)
-      (sut/as-error :not-found "user not found"))))
-
-
-
-;;;;
-;; HTTP layer
-;;;;
-
-;; HTTP helpers
-
-(defn with-status [status body]
-  {:status status
-   :body   body})
-
-(defn with-type [type x]
-  (if (vector? type)
-    (update x :type #(conj type %))
-    (assoc x :type type)))
-
-(defn as-http-response [x]
-  (sut/as-response (with-type [:http] x)))
-
-
-;; HTTP wrappers
-
-(defmethod sut/as-response [:http :ok] [x]
-  (with-status 200 (sut/get-data x)))
-
-(defmethod sut/as-response [:http :not-found] [x]
-  (with-status 404 (sut/get-data x)))
-
-
-;; HTTP handlers
-
-(defn handler [email]
-  (as-http-response (get-user-by-email email)))
-
-
-
-;;;;
-;; Test cases
-;;;;
-
 ;; Test helpers
-
-(defn reset-defaults! []
-  (sut/set-default-error-type! ::sut/error)
-  (sut/set-default-exception-type! ::sut/exception)
-  (sut/set-default-success-type! ::sut/success))
+;;;;
 
 (defn same? [type data meta x]
   (and
@@ -98,28 +28,10 @@
      :cljs (throw (js/Error. "boom!"))))
 
 
+
+;;;;
 ;; Tests
-
-(deftest defaults-overrides-test
-  (reset-defaults!)
-
-  (let [error ::error]
-    (is (= ::sut/error (sut/get-type (sut/as-error "boom!"))))
-    (sut/set-default-error-type! error)
-    (is (= error (sut/get-type (sut/as-error "boom!")))))
-
-  (let [exception ::exception]
-    (is (= ::sut/exception (sut/get-type (sut/?-> (throw!)))))
-    (sut/set-default-exception-type! exception)
-    (is (= exception (sut/get-type (sut/?->> (throw!))))))
-
-  (let [success ::success]
-    (is (= ::sut/success (sut/get-type (sut/as-success "done!"))))
-    (sut/set-default-success-type! success)
-    (is (= success (sut/get-type (sut/as-success "done!")))))
-
-  (reset-defaults!))
-
+;;;;
 
 (deftest objects-test
   (let [objects [nil true false 1 \1 "1" 'symbol :keyword ::keyword
@@ -133,33 +45,65 @@
       (is (nil? (sut/get-meta o))))))
 
 
-(deftest business-logic-test
-  (let [res1 (get-user-by-email "john@doe.com")
-        res2 (get-user-by-email "jane@doe.com")
-        res3 (get-user-by-email "andrew@doe.com")]
-    (is (sut/response? res1))
-    (is (sut/success? res1))
-    (is (not (sut/error? res1)))
-    (is (same? :ok user1 nil res1))
+(deftest responses-test
+  (testing "1-arity"
+    (let [data "response"
+          meta nil]
+      (is (same? ::sut/ok data meta (sut/as-ok data)))
+      (is (same? ::sut/success data meta (sut/as-success data)))
+      (is (same? ::sut/created data meta (sut/as-created data)))
+      (is (same? ::sut/accepted data meta (sut/as-accepted data)))
 
-    (is (sut/response? res2))
-    (is (sut/success? res2))
-    (is (not (sut/error? res2)))
-    (is (same? :ok user2 nil res2))
+      (is (same? ::sut/warning data meta (sut/as-warning data)))
+      (is (same? ::sut/error data meta (sut/as-error data)))
+      (is (same? ::sut/exception data meta (sut/as-exception data)))
+      (is (same? ::sut/unavailable data meta (sut/as-unavailable data)))
+      (is (same? ::sut/interrupted data meta (sut/as-interrupted data)))
+      (is (same? ::sut/incorrect data meta (sut/as-incorrect data)))
+      (is (same? ::sut/forbidden data meta (sut/as-forbidden data)))
+      (is (same? ::sut/unsupported data meta (sut/as-unsupported data)))
+      (is (same? ::sut/not-found data meta (sut/as-not-found data)))
+      (is (same? ::sut/conflict data meta (sut/as-conflict data)))
+      (is (same? ::sut/fault data meta (sut/as-fault data)))
+      (is (same? ::sut/busy data meta (sut/as-busy data)))))
 
-    (is (sut/response? res3))
-    (is (not (sut/success? res3)))
-    (is (sut/error? res3))
-    (is (same? :not-found "user not found" nil res3))))
+  (testing "2-arity"
+    (let [data "response"
+          meta "meta"]
+      (is (same? ::sut/ok data meta (sut/as-ok data meta)))
+      (is (same? ::sut/success data meta (sut/as-success data meta)))
+      (is (same? ::sut/created data meta (sut/as-created data meta)))
+      (is (same? ::sut/accepted data meta (sut/as-accepted data meta)))
 
+      (is (same? ::sut/warning data meta (sut/as-warning data meta)))
+      (is (same? ::sut/error data meta (sut/as-error data meta)))
+      (is (same? ::sut/exception data meta (sut/as-exception data meta)))
+      (is (same? ::sut/unavailable data meta (sut/as-unavailable data meta)))
+      (is (same? ::sut/interrupted data meta (sut/as-interrupted data meta)))
+      (is (same? ::sut/incorrect data meta (sut/as-incorrect data meta)))
+      (is (same? ::sut/forbidden data meta (sut/as-forbidden data meta)))
+      (is (same? ::sut/unsupported data meta (sut/as-unsupported data meta)))
+      (is (same? ::sut/not-found data meta (sut/as-not-found data meta)))
+      (is (same? ::sut/conflict data meta (sut/as-conflict data meta)))
+      (is (same? ::sut/fault data meta (sut/as-fault data meta)))
+      (is (same? ::sut/busy data meta (sut/as-busy data meta)))))
 
-(deftest http-layer-test
-  (let [res1 (handler "john@doe.com")
-        res2 (handler "jane@doe.com")
-        res3 (handler "andrew@doe.com")]
-    (is (= {:status 200, :body user1} res1))
-    (is (= {:status 200, :body user2} res2))
-    (is (= {:status 404, :body "user not found"} res3))))
+  (testing "setters/getters"
+    (let [from-type ::sut/ok
+          to-type   ::sut/success
+          from-data "from"
+          to-data   "to"
+          from-meta nil
+          to-meta   {}
+          res       (sut/as-success from-type from-data from-meta)
+          unwrapped (sut/unwrap res)]
+      (is (same? from-type from-data from-meta res))
+      (is (same? to-type from-data from-meta (sut/set-type res to-type)))
+      (is (same? to-type to-data from-meta (-> res (sut/set-type to-type) (sut/set-data to-data))))
+      (is (same? to-type to-data to-meta (-> res (sut/set-type to-type) (sut/set-data to-data) (sut/set-meta to-meta))))
+      (is (and (map? unwrapped) (not (sut/error? unwrapped)) (not (sut/success? unwrapped))))
+      (is (= {} (sut/unwrap {}))))))
+
 
 
 (deftest safe-test
