@@ -4,30 +4,7 @@
    [clojure.set :as set]))
 
 ;;;;
-;; Defaults
-;;;;
-
-(def ^{:added "0.0.7"}
-  default-success-type
-  "Default unified http `success` type."
-  ::ok)
-
-
-(def ^{:added "0.0.7"}
-  default-client-error-type
-  "Default unified http `client error` type."
-  ::bad-request)
-
-
-(def ^{:added "0.0.7"}
-  default-server-error-type
-  "Default unified http `server error` type."
-  ::internal-server-error)
-
-
-
-;;;;
-;; HTTP codes
+;; HTTP status codes
 ;;;;
 
 (def ^{:added "0.0.7"}
@@ -124,11 +101,11 @@
   "Returns a http status by the given response type."
   {:added "0.0.7"}
   [response-type]
-  (get response-type->http-status response-type ::unknown))
+  (get response-type->http-status response-type))
 
 
 (defn to-type
   "Returns a response type by the given http status."
   {:added "0.0.7"}
   [http-status]
-  (get http-status->response-type http-status ::unknown))
+  (get http-status->response-type http-status))
