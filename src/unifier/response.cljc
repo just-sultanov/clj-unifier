@@ -507,7 +507,7 @@
   false)
 
 
-(defonce
+(def
   ^{:doc   "A registry for associating unified response types with http response types."
     :added "0.0.10"}
   *registry
