@@ -25,19 +25,22 @@
    ::non-authoritative-information 203
    ::no-content                    204
    ::reset-content                 205
-   ::partial-content               206})
+   ::partial-content               206
+   ::multi-status                  207
+   ::already-reported              208
+   ::im-used                       226})
 
 
 (def ^{:added "0.0.7"}
   redirection-status-codes
   "Redirection `3xx` http status codes."
-  {::multiple-choices   300
+  {::multiple-choice    300
    ::moved-permanently  301
    ::found              302
    ::see-other          303
    ::not-modified       304
    ::use-proxy          305
-   ::switch-proxy       306
+   ::switch-proxy       306 ;; Unused - This response code is no longer used; it is just reserved. It was used in a previous version of the HTTP/1.1 specification.
    ::temporary-redirect 307
    ::permanent-redirect 308})
 
@@ -58,22 +61,38 @@
    ::gone                            410
    ::length-required                 411
    ::precondition-failed             412
-   ::request-entity-too-large        413
-   ::request-uri-too-long            414
+   ::payload-too-large               413
+   ::uri-too-long                    414
    ::unsupported-media-type          415
-   ::requested-range-not-satisfiable 416
-   ::expectation-failed              417})
+   ::range-not-satisfiable           416
+   ::expectation-failed              417
+   ::im-a-teapot                     418
+   ::misdirected-request             421
+   ::unprocessable-entity            422
+   ::locked                          423
+   ::failed-dependency               424
+   ::too-early                       425
+   ::upgrade-required                426
+   ::precondition-required           428
+   ::too-many-requests               429
+   ::request-header-fields-too-large 431
+   ::unavailable-for-legal-reasons   451})
 
 
 (def ^{:added "0.0.7"}
   server-error-status-codes
   "Server error `5xx` http status codes."
-  {::internal-server-error      500
-   ::not-implemented            501
-   ::bad-gateway                502
-   ::service-unavailable        503
-   ::gateway-timeout            504
-   ::http-version-not-supported 505})
+  {::internal-server-error           500
+   ::not-implemented                 501
+   ::bad-gateway                     502
+   ::service-unavailable             503
+   ::gateway-timeout                 504
+   ::http-version-not-supported      505
+   ::variant-also-negotiates         506
+   ::insufficient-storage            507
+   ::loop-detected                   508
+   ::not-extended                    510
+   ::network-authentication-required 511})
 
 
 (def ^{:added "0.0.7"}
