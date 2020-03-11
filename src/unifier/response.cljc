@@ -2,7 +2,10 @@
   "A Clojure(Script) library for unified responses."
   #?(:clj (:refer-clojure :exclude [-> ->>]))
   #?(:clj  (:require [clojure.core :as c])
-     :cljs (:require-macros unifier.response)))
+     :cljs (:require-macros unifier.response))
+  (:require
+   [unifier.helpers :as helpers]
+   [unifier.response.http :as http]))
 
 ;;;;
 ;; Response protocols
@@ -490,3 +493,126 @@
      {:added "0.0.6"}
      [& forms]
      `(safe (->> ~@forms) as-exception)))
+
+
+
+;;;;
+;; Unified http responses
+;;;;
+
+(def ^{:added "0.0.10", :dynamic true}
+  *allow-override?*
+  "A flag to allow overriding already associated keys in the registry.
+  Overrides are disabled by default."
+  false)
+
+
+(defonce
+  ^{:doc   "A registry for associating unified response types with http response types."
+    :added "0.0.10"}
+  *registry
+  (atom {::success      ::http/ok
+         ::ok           ::http/ok
+         ::created      ::http/created
+         ::deleted      ::http/no-content
+         ::accepted     ::http/accepted
+
+         ::error        ::http/internal-server-error
+         ::exception    ::http/internal-server-error
+         ::unknown      ::http/bad-request
+         ::warning      ::http/bad-request
+         ::unavailable  ::http/service-unavailable
+         ::interrupted  ::http/bad-request
+         ::incorrect    ::http/bad-request
+         ::unauthorized ::http/unauthorized
+         ::forbidden    ::http/forbidden
+         ::unsupported  ::http/method-not-allowed
+         ::not-found    ::http/not-found
+         ::conflict     ::http/conflict
+         ::fault        ::http/internal-server-error
+         ::busy         ::http/service-unavailable}))
+
+
+(defn link!
+  "Associate unified response type with http response type.
+
+  Returns:
+    * `true` - when all unified response types successfully linked
+
+  Params:
+    * `unified` - unified response type
+    * `http`    - http response type
+
+  Throws:
+    * `IllegalArgumentException`:
+      - throws when the given http response type is unknown
+      - throws when the given unified response type has been already associated with http response type"
+  {:added "0.0.10"}
+  [unified http & kvs]
+  (when-not (contains? http/allowed-types http)
+    (let [msg (helpers/format "Unknown http response type `%s`" http)]
+      (throw #?(:clj  (IllegalArgumentException. msg (ex-data {::http/type http}))
+                :cljs (js/Error. msg)))))
+  (when-not *allow-override?*
+    (when-some [http (get @*registry unified)]
+      (let [msg (helpers/format "Unified response type `%s` already been associated with `%s`" unified http)]
+        (throw #?(:clj  (IllegalArgumentException. msg (ex-data {::type unified}))
+                  :cljs (js/Error. msg))))))
+  (swap! *registry assoc unified http)
+  (if kvs
+    (recur (first kvs) (second kvs) (nnext kvs))
+    true))
+
+
+(defn link
+  "Same as `link!` but allows overrides by default."
+  {:added "0.0.10"}
+  [unified http & kvs]
+  (binding [*allow-override?* true]
+    (apply link! unified http kvs)))
+
+
+(defn with-default
+  "Returns `default` http response type by the given unified response type.
+
+  Returns:
+    If the given unified response is:
+     * `success`                           - `:unifier.response.http/ok`
+     * `error`                             - `:unifier.response.http/bad-request`
+     * `::error`, `::exception`, `::fault` - `:unifier.response.http/internal-server-error`
+    Otherwise `nil`."
+  {:added "0.0.10"}
+  [x]
+  (let [type (get-type x)]
+    (cond
+      (success? x) ::http/ok
+      (error? x) (if (contains? #{::error ::exception ::fault} type)
+                   ::http/internal-server-error
+                   ::http/bad-request))))
+
+
+;; TODO: Check the HTTP status? E.g., the `redirect` response should add a header `Location`
+(defn response
+  "Returns ring response, where:
+    * `:status` - gets from the registry by the unified response type
+    * `:header` - empty map
+    * `:body`   - unwrapped unified response"
+  {:added "0.0.10"}
+  ([x]
+   (response (with-default x) x))
+
+  ([type x]
+   {:headers {}
+    :status  (http/to-status type)
+    :body    (unwrap x)}))
+
+
+(defn as-http
+  "Returns ring response by the given unified response type."
+  {:added "0.0.10"}
+  [x]
+  (when (response? x)
+    (let [type (get-type x)]
+      (if-some [http (get @*registry type)]
+        (response http x)
+        (response x)))))
