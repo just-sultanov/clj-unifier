@@ -26,10 +26,10 @@
 
 
 ;;;;
-;; Associate user defined unified response types with http response types
+;; Associate user-defined unified response types with http response types
 ;;;;
 
-(r/link!
+(r/link
   ::api/unsupported ::http/not-implemented
   ::unsupported ::http/not-implemented
   :user/found ::http/ok
@@ -39,6 +39,7 @@
   :user/not-created ::http/conflict
   :user/deleted ::http/no-content
   :user/not-deleted ::http/not-found)
+
 
 
 ;;;;

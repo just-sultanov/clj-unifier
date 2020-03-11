@@ -183,7 +183,7 @@
 (def ^{:added "0.0.7"}
   success-types
   "Common `success` types."
-  #{::ok ::success ::created ::deleted ::accepted})
+  #{::success ::created ::deleted ::accepted})
 
 
 (defn as-success
@@ -197,16 +197,6 @@
 
   ([type data meta]
    (->UnifiedSuccess type data meta)))
-
-
-(defn as-ok
-  "Returns unified `::ok` response."
-  {:added "0.0.7"}
-  ([data]
-   (as-ok data nil))
-
-  ([data meta]
-   (as-success ::ok data meta)))
 
 
 (defn as-created
@@ -248,7 +238,7 @@
   error-types
   "Common `error` types."
   #{::error ::exception ::unknown ::warning ::unavailable ::interrupted ::incorrect
-    ::unauthorized ::forbidden ::unsupported ::not-found ::conflict ::fault ::busy})
+    ::unauthorized ::forbidden ::unsupported ::not-found ::conflict ::busy})
 
 
 (defn as-error
@@ -374,16 +364,6 @@
    (as-error ::conflict data meta)))
 
 
-(defn as-fault
-  "Returns unified `::fault` response."
-  {:added "0.0.7"}
-  ([data]
-   (as-fault data nil))
-
-  ([data meta]
-   (as-error ::fault data meta)))
-
-
 (defn as-busy
   "Returns unified `::busy` response."
   {:added "0.0.7"}
@@ -507,12 +487,10 @@
   false)
 
 
-(def
-  ^{:doc   "A registry for associating unified response types with http response types."
-    :added "0.0.10"}
+(def ^{:added "0.0.10"}
   *registry
+  "A registry for associating unified response types with http response types."
   (atom {::success      ::http/ok
-         ::ok           ::http/ok
          ::created      ::http/created
          ::deleted      ::http/no-content
          ::accepted     ::http/accepted
@@ -529,7 +507,6 @@
          ::unsupported  ::http/method-not-allowed
          ::not-found    ::http/not-found
          ::conflict     ::http/conflict
-         ::fault        ::http/internal-server-error
          ::busy         ::http/service-unavailable}))
 
 
@@ -577,16 +554,16 @@
 
   Returns:
     If the given unified response is:
-     * `success`                           - `:unifier.response.http/ok`
-     * `error`                             - `:unifier.response.http/bad-request`
-     * `::error`, `::exception`, `::fault` - `:unifier.response.http/internal-server-error`
+     * `success`                - `:unifier.response.http/ok`
+     * `error`                  - `:unifier.response.http/bad-request`
+     * `::error`, `::exception` - `:unifier.response.http/internal-server-error`
     Otherwise `nil`."
   {:added "0.0.10"}
   [x]
   (let [type (get-type x)]
     (cond
       (success? x) ::http/ok
-      (error? x) (if (contains? #{::error ::exception ::fault} type)
+      (error? x) (if (contains? #{::error ::exception} type)
                    ::http/internal-server-error
                    ::http/bad-request))))
 

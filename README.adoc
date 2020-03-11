@@ -125,18 +125,17 @@ r/as-http
 
 
 ;;;;
-;; Available predefined unified `success` responses with associated http response types
+;; Available predefined unified `success` responses associated with http response types
 ;;;;
 
 r/as-success      -> :unifier.response/success      -> :unifier.response.http/ok                    -> 200
-r/as-ok           -> :unifier.response/ok           -> :unifier.response.http/ok                    -> 200
 r/as-created      -> :unifier.response/created      -> :unifier.response.http/created               -> 201
 r/as-deleted      -> :unifier.response/deleted      -> :unifier.response.http/no-content            -> 204
 r/as-accepted     -> :unifier.response/accepted     -> :unifier.response.http/accepted              -> 202
 
 
 ;;;;
-;; Available predefined unified `error` responses with associated http response types
+;; Available predefined unified `error` responses associated with http response types
 ;;;;
 
 r/as-error        -> :unifier.response/error        -> :unifier.response.http/internal-server-error -> 500
@@ -151,7 +150,6 @@ r/as-forbidden    -> :unifier.response/forbidden    -> :unifier.response.http/fo
 r/as-unsupported  -> :unifier.response/unsupported  -> :unifier.response.http/method-not-allowed    -> 405
 r/as-not-found    -> :unifier.response/not-found    -> :unifier.response.http/not-found             -> 404
 r/as-conflict     -> :unifier.response/conflict     -> :unifier.response.http/conflict              -> 409
-r/as-fault        -> :unifier.response/fault        -> :unifier.response.http/internal-server-error -> 500
 r/as-busy         -> :unifier.response/busy         -> :unifier.response.http/service-unavailable   -> 503
 ----
 

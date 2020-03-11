@@ -76,7 +76,6 @@
   (testing "1-arity"
     (let [data "response"
           meta nil]
-      (is (same? ::sut/ok data meta (sut/as-ok data)))
       (is (same? ::sut/success data meta (sut/as-success data)))
       (is (same? ::sut/created data meta (sut/as-created data)))
       (is (same? ::sut/deleted data meta (sut/as-deleted data)))
@@ -94,14 +93,12 @@
       (is (same? ::sut/unsupported data meta (sut/as-unsupported data)))
       (is (same? ::sut/not-found data meta (sut/as-not-found data)))
       (is (same? ::sut/conflict data meta (sut/as-conflict data)))
-      (is (same? ::sut/fault data meta (sut/as-fault data)))
       (is (same? ::sut/busy data meta (sut/as-busy data)))))
 
 
   (testing "2-arity"
     (let [data "response"
           meta "meta"]
-      (is (same? ::sut/ok data meta (sut/as-ok data meta)))
       (is (same? ::sut/success data meta (sut/as-success data meta)))
       (is (same? ::sut/created data meta (sut/as-created data meta)))
       (is (same? ::sut/deleted data meta (sut/as-deleted data meta)))
@@ -119,7 +116,6 @@
       (is (same? ::sut/unsupported data meta (sut/as-unsupported data meta)))
       (is (same? ::sut/not-found data meta (sut/as-not-found data meta)))
       (is (same? ::sut/conflict data meta (sut/as-conflict data meta)))
-      (is (same? ::sut/fault data meta (sut/as-fault data meta)))
       (is (same? ::sut/busy data meta (sut/as-busy data meta)))))
 
 
@@ -269,9 +265,6 @@
       (is (same-http? 200 {} (with-type ::sut/success)
             (sut/as-http (sut/as-success data meta))))
 
-      (is (same-http? 200 {} (with-type ::sut/ok)
-            (sut/as-http (sut/as-ok data meta))))
-
       (is (same-http? 201 {} (with-type ::sut/created)
             (sut/as-http (sut/as-created data meta))))
 
@@ -318,9 +311,6 @@
 
       (is (same-http? 409 {} (with-type ::sut/conflict)
             (sut/as-http (sut/as-conflict data meta))))
-
-      (is (same-http? 500 {} (with-type ::sut/fault)
-            (sut/as-http (sut/as-fault data meta))))
 
       (is (same-http? 503 {} (with-type ::sut/busy)
             (sut/as-http (sut/as-busy data meta)))))
