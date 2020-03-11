@@ -12,7 +12,7 @@
                        :main-opts   ["--main" "nrepl.cmdline"
                                      "--middleware" "[cider.piggieback/wrap-cljs-repl]"]}
 
-           :test-clj  {:extra-deps  {lambdaisland/kaocha           {:mvn/version "0.0-590"}
+           :test-clj  {:extra-deps  {lambdaisland/kaocha           {:mvn/version "0.0-597"}
                                      lambdaisland/kaocha-cloverage {:mvn/version "0.0-41"}}
                        :extra-paths ["test/src"]}
 
