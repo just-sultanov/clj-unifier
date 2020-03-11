@@ -1,5 +1,9 @@
 == Changelog
 
+=== v0.0.12
+
+* Synchronized http response status codes with link:https://developer.mozilla.org/en-US/docs/Web/HTTP/Status[source].
+
 === v0.0.11
 
 * Removed duplicated response types
