@@ -1,5 +1,10 @@
 == Changelog
 
+=== v0.0.13
+
+* Changed project dependencies:
+- A ClojureScript is a provided dependency
+
 === v0.0.12
 
 * Synchronized http response status codes with link:https://developer.mozilla.org/en-US/docs/Web/HTTP/Status[source].
