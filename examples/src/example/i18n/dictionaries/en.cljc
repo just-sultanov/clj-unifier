@@ -1,7 +1,8 @@
 (ns example.i18n.dictionaries.en)
 
 (def dictionary
-  {:example.api/unsupported "The given `{1}` command unsupported"
+  {:example.api/unsupported "The given command version `{1}` or command `{2}` unsupported"
+   :example.web/unsupported "The given API version `{1}` or API method `{2}` unsupported"
 
    :users/received          (fn [x]
                               (cond

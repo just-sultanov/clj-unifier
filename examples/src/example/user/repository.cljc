@@ -4,6 +4,7 @@
    [example.helpers :as helpers]
    [example.data :as data]))
 
+;; This is database layer
 ;; NOTE: You can also use unified responses for this layer
 
 (defonce *db (atom (helpers/index-by :user/id [data/user1 data/user2])))

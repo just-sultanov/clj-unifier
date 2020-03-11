@@ -2,6 +2,7 @@
   (:require
    #?(:clj  [clojure.test :refer [deftest is]]
       :cljs [cljs.test :refer-macros [deftest is]])
+   [unifier.response :as r]
    [example.helpers :as helpers]
    [example.data :as data]
    [example.web :as sut]))
@@ -52,8 +53,11 @@
 ;;;;
 
 (deftest web-test
-  (is (same? 501 :unifier.response/unsupported
+  (is (same? 405 ::r/unsupported
         (sut/cmd-handler (with-req (with-cmd ::unknown)))))
+
+  (is (same? 405 ::r/unsupported
+        (sut/cmd-handler (with-req :v2 :en (with-cmd :user/get-all)))))
 
   (is (same? 200 :users/found
         (sut/cmd-handler (with-req (with-cmd :users/get-all)))))
