@@ -27,6 +27,134 @@ Add the following dependency in your project:
 
 You can see a full example link:https://github.com/just-sultanov/clj-unifier/tree/master/examples/src/example[here].
 
+[source,clojure]
+----
+(ns your.app
+  (:require 
+    [unifier.response :as r]
+    [unifier.response.http :as http]))
+
+;;;;
+;; Unified responses
+;;;;
+
+;; Unified success responses
+(r/as-success "data")                ;; `data` with default response `type`
+;; => #unifier.response.UnifiedSuccess{:type :unifier.response/success, :data "data", :meta nil}
+
+(r/as-success "data" "meta")         ;; `data` and `meta` with default response `type`
+;; => #unifier.response.UnifiedSuccess{:type :unifier.response/success, :data "data", :meta "meta"}
+
+(r/as-success ::pass "data" "meta")  ;; `data` and `meta` with user-defined response `type`
+;; => #unifier.response.UnifiedSuccess{:type :your.app/pass, :data "data", :meta "meta"}
+
+
+;; Unified error responses
+(r/as-error "data")                  ;; `data` with default response `type`
+;; => #unifier.response.UnifiedError{:type :unifier.response/error, :data "data", :meta nil}
+
+(r/as-error "data" "meta")           ;; `data` and `meta` with default response `type`
+;; => #unifier.response.UnifiedError{:type :unifier.response/error, :data "data", :meta "meta"}
+
+(r/as-error ::fail "data" "meta")    ;; `data` and `meta` with user-defined response `type`
+;; => #unifier.response.UnifiedError{:type :your.app/fail, :data "data", :meta "meta"}
+
+
+;;;;
+;; Public API
+;;;;
+
+;; Predicates
+r/response?
+r/error?  
+r/success?
+
+;; Getters
+r/get-type
+r/get-data 
+r/get-meta
+
+;; Setters
+r/set-type 
+r/set-data
+r/set-meta
+
+;; Helpers
+r/unwrap 
+r/-> 
+r/->>
+r/?-> 
+r/?->>
+
+;; HTTP
+r/link! 
+r/link
+r/as-http
+
+
+
+;;;;
+;; Examples
+;;;;
+
+(defn create [email]
+  (if-some [user (db/create email)]
+    (r/as-success :user/created user {:i18n/key :user/created :i18n/params email})
+    (r/as-error :user/not-created email {:i18n/key :user/exists :i18n/params email})))
+
+
+(defmulti execute
+  (fn [{:cmd/keys [version name]}]
+    [version name]))
+
+(defmethod execute :default
+  [{:as cmd :cmd/keys [version name]}]
+  (r/as-unsupported cmd {:i18n/key ::unsupported :i18n/params [version name]}))
+
+
+
+;;;;
+;; Unified http responses
+;;;;
+
+(r/as-http (r/as-success "data"))
+;; => {:status 200, :headers {}, :body {:type :unifier.response/success, :data "data", :meta nil}}
+
+(r/as-http (r/as-error "data"))
+;; => {:status 500, :headers {}, :body {:type :unifier.response/error, :data "data", :meta nil}}
+
+
+;;;;
+;; Available predefined unified `success` responses with associated http response types
+;;;;
+
+r/as-success      -> :unifier.response/success      -> :unifier.response.http/ok                    -> 200
+r/as-ok           -> :unifier.response/ok           -> :unifier.response.http/ok                    -> 200
+r/as-created      -> :unifier.response/created      -> :unifier.response.http/created               -> 201
+r/as-deleted      -> :unifier.response/deleted      -> :unifier.response.http/no-content            -> 204
+r/as-accepted     -> :unifier.response/accepted     -> :unifier.response.http/accepted              -> 202
+
+
+;;;;
+;; Available predefined unified `error` responses with associated http response types
+;;;;
+
+r/as-error        -> :unifier.response/error        -> :unifier.response.http/internal-server-error -> 500
+r/as-exception    -> :unifier.response/exception    -> :unifier.response.http/internal-server-error -> 500
+r/as-unknown      -> :unifier.response/unknown      -> :unifier.response.http/bad-request           -> 400
+r/as-warning      -> :unifier.response/warning      -> :unifier.response.http/bad-request           -> 400
+r/as-unavailable  -> :unifier.response/unavailable  -> :unifier.response.http/service-unavailable   -> 503
+r/as-interrupted  -> :unifier.response/interrupted  -> :unifier.response.http/bad-request           -> 400
+r/as-incorrect    -> :unifier.response/incorrect    -> :unifier.response.http/bad-request           -> 400
+r/as-unauthorized -> :unifier.response/unauthorized -> :unifier.response.http/unauthorized          -> 401
+r/as-forbidden    -> :unifier.response/forbidden    -> :unifier.response.http/forbidden             -> 403
+r/as-unsupported  -> :unifier.response/unsupported  -> :unifier.response.http/method-not-allowed    -> 405
+r/as-not-found    -> :unifier.response/not-found    -> :unifier.response.http/not-found             -> 404
+r/as-conflict     -> :unifier.response/conflict     -> :unifier.response.http/conflict              -> 409
+r/as-fault        -> :unifier.response/fault        -> :unifier.response.http/internal-server-error -> 500
+r/as-busy         -> :unifier.response/busy         -> :unifier.response.http/service-unavailable   -> 503
+----
+
 === Development
 
 [source,bash]

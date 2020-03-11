@@ -4,6 +4,8 @@
    [unifier.response :as r]
    [example.user.repository :as repo]))
 
+;; This is business logic layer
+
 (defn get-all []
   (let [users (repo/get-all)]
     (r/as-success :users/found users {:i18n/key :users/received :i18n/params (count users)})))

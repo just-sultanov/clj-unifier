@@ -1,7 +1,8 @@
 (ns example.i18n.dictionaries.ru)
 
 (def dictionary
-  {:example.api/unsupported "Команда `{1}` не поддерживается"
+  {:example.api/unsupported "Версия команды `{1}` или команда `{2}` не поддерживается"
+   :example.web/unsupported "Версия API `{1}` или метод API `{2}` не поддерживается"
 
    :users/received          (fn [x]
                               (cond

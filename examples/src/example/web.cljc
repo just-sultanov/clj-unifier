@@ -15,8 +15,8 @@
 
 
 (defmethod invoke :default
-  [{:as req :api/keys [method]}]
-  (r/as-unsupported req {:i18n/key ::unsupported :i18n/params method}))
+  [{:as req :api/keys [version method]}]
+  (r/as-unsupported req {:i18n/key ::unsupported :i18n/params [version method]}))
 
 
 (defmethod invoke [:v1 :cmd/execute]
@@ -26,20 +26,19 @@
 
 
 ;;;;
-;; Mapper for the response types
+;; Associate user defined unified response types with http response types
 ;;;;
 
-;; TODO: use derive?
-(def response-types
-  {::r/unsupported ::http/not-implemented
-   :user/found       ::http/ok
-   :user/not-found   ::http/not-found
-   :users/found      ::http/ok
-   :user/created     ::http/created
-   :user/not-created ::http/conflict
-   :user/deleted     ::http/no-content
-   :user/not-deleted ::http/not-found})
-
+(r/link!
+  ::api/unsupported ::http/not-implemented
+  ::unsupported ::http/not-implemented
+  :user/found ::http/ok
+  :user/not-found ::http/not-found
+  :users/found ::http/ok
+  :user/created ::http/created
+  :user/not-created ::http/conflict
+  :user/deleted ::http/no-content
+  :user/not-deleted ::http/not-found)
 
 
 ;;;;
@@ -59,15 +58,6 @@
       res)))
 
 
-
-(defn- http-transformer [res]
-  (let [type          (r/get-type res)
-        response-type (get response-types type)]
-    {:status (http/to-status response-type)
-     :body   (r/unwrap res)}))
-
-
-
 (defn- transform [opts]
   (let [tfs (:transformers opts)]
     (fn [res]
@@ -84,11 +74,13 @@
 
 (defn cmd-handler [req]
   (let [language (:i18n/language req)
-        opts     {:transformers [(translate-transformer language)
-                                 http-transformer]}
+        opts     {:transformers [(translate-transformer language)]}
         req      (assoc req :api/method :cmd/execute)
         tf       (transform opts)]
-    (tf (invoke req))))
+    (-> req
+      invoke
+      tf
+      r/as-http)))
 
 
 

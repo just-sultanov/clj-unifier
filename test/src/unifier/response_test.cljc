@@ -1,8 +1,27 @@
 (ns unifier.response-test
   (:require
-   #?(:clj  [clojure.test :refer [deftest testing is]]
-      :cljs [cljs.test :refer-macros [deftest testing is]])
+   #?(:clj  [clojure.test :refer [deftest testing is use-fixtures]]
+      :cljs [cljs.test :refer-macros [deftest testing is use-fixtures]])
+   [unifier.response.http :as http]
    [unifier.response :as sut]))
+
+;;;;
+;; Fixtures
+;;;
+
+(defonce registry @sut/*registry)
+
+(defn reset-changes! []
+  (reset! sut/*registry registry))
+
+
+(use-fixtures :each
+  (fn [f]
+    (reset-changes!)
+    (f)
+    (reset-changes!)))
+
+
 
 ;;;;
 ;; Test helpers
@@ -13,6 +32,13 @@
     (= type (sut/get-type x))
     (= data (sut/get-data x))
     (= meta (sut/get-meta x))
+    true))
+
+(defn same-http? [status headers body x]
+  (and
+    (= status (:status x))
+    (= headers (:headers x))
+    (= body (:body x))
     true))
 
 (defn calc [x]
@@ -45,6 +71,7 @@
       (is (nil? (sut/get-meta o))))))
 
 
+
 (deftest responses-test
   (testing "1-arity"
     (let [data "response"
@@ -70,6 +97,7 @@
       (is (same? ::sut/fault data meta (sut/as-fault data)))
       (is (same? ::sut/busy data meta (sut/as-busy data)))))
 
+
   (testing "2-arity"
     (let [data "response"
           meta "meta"]
@@ -93,6 +121,7 @@
       (is (same? ::sut/conflict data meta (sut/as-conflict data meta)))
       (is (same? ::sut/fault data meta (sut/as-fault data meta)))
       (is (same? ::sut/busy data meta (sut/as-busy data meta)))))
+
 
   (testing "setters/getters"
     (let [from-type ::sut/ok
@@ -124,6 +153,7 @@
        (is (sut/error? (sut/safe (throw (js/Error. "boom!")) sut/as-error))))))
 
 
+
 (deftest thread-first-macro-test
   (let [res1 (sut/-> 42 boom!)
         res2 (sut/-> 42 calc calc)
@@ -137,6 +167,7 @@
     (is (same? ::sut/error "boom!" 46 res5))))
 
 
+
 (deftest safe-thread-first-macro-test
   (let [res1 (sut/?-> 42 calc calc boom! calc)
         res2 (sut/?-> 42 calc throw! calc boom! calc)
@@ -144,6 +175,7 @@
     (is (= ::sut/error (sut/get-type res1)))
     (is (= ::sut/exception (sut/get-type res2)))
     (is (= ::sut/success (sut/get-type res3)))))
+
 
 
 (deftest thread-last-macro-test
@@ -159,6 +191,7 @@
     (is (same? ::sut/error "boom!" 46 res5))))
 
 
+
 (deftest safe-thread-last-macro-test
   (let [res1 (sut/?->> 42 calc calc boom! calc)
         res2 (sut/?->> 42 calc throw! calc boom! calc)
@@ -166,3 +199,144 @@
     (is (= ::sut/error (sut/get-type res1)))
     (is (= ::sut/exception (sut/get-type res2)))
     (is (= ::sut/success (sut/get-type res3)))))
+
+
+
+(deftest link-user-defined-types-test
+  (testing "link one pair"
+    (is (nil? (get @sut/*registry ::ok1)))
+    (is (nil? (get @sut/*registry ::bad-request1)))
+    (is (nil? (get @sut/*registry ::not-found1)))
+    (is (true? (sut/link! ::ok1 ::http/ok)))
+    (is (true? (sut/link! ::bad-request1 ::http/bad-request)))
+    (is (true? (sut/link! ::not-found1 ::http/not-found)))
+    (is (= ::http/ok (get @sut/*registry ::ok1)))
+    (is (= ::http/bad-request (get @sut/*registry ::bad-request1)))
+    (is (= ::http/not-found (get @sut/*registry ::not-found1))))
+
+
+  (testing "link multiple pairs"
+    (is (nil? (get @sut/*registry ::ok2)))
+    (is (nil? (get @sut/*registry ::bad-request2)))
+    (is (nil? (get @sut/*registry ::not-found2)))
+    (is (true? (sut/link!
+                 ::ok2 ::http/ok
+                 ::bad-request2 ::http/bad-request
+                 ::not-found2 ::http/not-found)))
+    (is (= ::http/ok (get @sut/*registry ::ok2)))
+    (is (= ::http/bad-request (get @sut/*registry ::bad-request2)))
+    (is (= ::http/not-found (get @sut/*registry ::not-found2))))
+
+
+  (testing "link existing pairs"
+    (is (= ::http/ok (get @sut/*registry ::ok1)))
+    (is (= ::http/bad-request (get @sut/*registry ::bad-request1)))
+    (is (= ::http/not-found (get @sut/*registry ::not-found1)))
+    (is (thrown? #?(:clj IllegalArgumentException, :cljs js/Error)
+          (sut/link! ::ok1 ::http/ok)))
+    (is (thrown? #?(:clj IllegalArgumentException, :cljs js/Error)
+          (sut/link! ::bad-request1 ::http/bad-request)))
+    (is (thrown? #?(:clj IllegalArgumentException, :cljs js/Error)
+          (sut/link! ::not-found1 ::http/not-found)))
+    (is (true? (sut/link ::ok1 ::http/ok)))
+    (is (true? (sut/link ::bad-request1 ::http/bad-request)))
+    (is (true? (sut/link ::not-found1 ::http/not-found)))
+    (is (true? (sut/link
+                 ::ok1 ::http/ok
+                 ::bad-request1 ::http/bad-request
+                 ::not-found1 ::http/not-found)))
+    (is (= ::http/ok (get @sut/*registry ::ok1)))
+    (is (= ::http/bad-request (get @sut/*registry ::bad-request1)))
+    (is (= ::http/not-found (get @sut/*registry ::not-found1))))
+
+
+  (testing "link bad http response types"
+    (is (thrown? #?(:clj IllegalArgumentException, :cljs js/Error)
+          (sut/link! ::ok ::ok)))
+    (is (thrown? #?(:clj IllegalArgumentException, :cljs js/Error)
+          (sut/link! ::bad-request ::bad-request)))
+    (is (thrown? #?(:clj IllegalArgumentException, :cljs js/Error)
+          (sut/link! ::not-found ::not-found1)))))
+
+
+
+(deftest as-http-test
+  (let [data      "data"
+        meta      "meta"
+        with-type (fn [type] {:type type :data data :meta meta})]
+
+    (testing "common `success` unified responses"
+      (is (same-http? 200 {} (with-type ::sut/success)
+            (sut/as-http (sut/as-success data meta))))
+
+      (is (same-http? 200 {} (with-type ::sut/ok)
+            (sut/as-http (sut/as-ok data meta))))
+
+      (is (same-http? 201 {} (with-type ::sut/created)
+            (sut/as-http (sut/as-created data meta))))
+
+      (is (same-http? 204 {} (with-type ::sut/deleted)
+            (sut/as-http (sut/as-deleted data meta))))
+
+      (is (same-http? 202 {} (with-type ::sut/accepted)
+            (sut/as-http (sut/as-accepted data meta)))))
+
+
+    (testing "common `error` unified responses"
+      (is (same-http? 500 {} (with-type ::sut/error)
+            (sut/as-http (sut/as-error data meta))))
+
+      (is (same-http? 500 {} (with-type ::sut/exception)
+            (sut/as-http (sut/as-exception data meta))))
+
+      (is (same-http? 400 {} (with-type ::sut/unknown)
+            (sut/as-http (sut/as-unknown data meta))))
+
+      (is (same-http? 400 {} (with-type ::sut/warning)
+            (sut/as-http (sut/as-warning data meta))))
+
+      (is (same-http? 503 {} (with-type ::sut/unavailable)
+            (sut/as-http (sut/as-unavailable data meta))))
+
+      (is (same-http? 400 {} (with-type ::sut/interrupted)
+            (sut/as-http (sut/as-interrupted data meta))))
+
+      (is (same-http? 400 {} (with-type ::sut/incorrect)
+            (sut/as-http (sut/as-incorrect data meta))))
+
+      (is (same-http? 401 {} (with-type ::sut/unauthorized)
+            (sut/as-http (sut/as-unauthorized data meta))))
+
+      (is (same-http? 403 {} (with-type ::sut/forbidden)
+            (sut/as-http (sut/as-forbidden data meta))))
+
+      (is (same-http? 405 {} (with-type ::sut/unsupported)
+            (sut/as-http (sut/as-unsupported data meta))))
+
+      (is (same-http? 404 {} (with-type ::sut/not-found)
+            (sut/as-http (sut/as-not-found data meta))))
+
+      (is (same-http? 409 {} (with-type ::sut/conflict)
+            (sut/as-http (sut/as-conflict data meta))))
+
+      (is (same-http? 500 {} (with-type ::sut/fault)
+            (sut/as-http (sut/as-fault data meta))))
+
+      (is (same-http? 503 {} (with-type ::sut/busy)
+            (sut/as-http (sut/as-busy data meta)))))
+
+
+    (testing "`user-defined` unified responses"
+      (is (same-http? 200 {} (with-type ::done)
+            (sut/as-http (sut/as-success ::done data meta))))
+
+      (sut/link! ::created ::http/created)
+      (is (same-http? 201 {} (with-type ::created)
+            (sut/as-http (sut/as-success ::created data meta))))
+
+      (is (same-http? 400 {} (with-type ::fail)
+            (sut/as-http (sut/as-error ::fail data meta))))
+
+      (sut/link! ::fail ::http/internal-server-error)
+      (is (same-http? 500 {} (with-type ::fail)
+            (sut/as-http (sut/as-error ::fail data meta)))))))
