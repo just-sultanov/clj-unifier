@@ -1,5 +1,5 @@
 (ns unifier.response.http
-  "Unified HTTP responses."
+  "Unified http responses."
   (:require
    [clojure.set :as set]))
 
@@ -9,7 +9,7 @@
 
 (def ^{:added "0.0.7"}
   informational-status-codes
-  "HTTP `informational` 1xx status codes."
+  "Informational `1xx` http status codes."
   {::continue            100
    ::switching-protocols 101
    ::processing          102
@@ -18,7 +18,7 @@
 
 (def ^{:added "0.0.7"}
   success-status-codes
-  "HTTP `success` 2xx status codes."
+  "Success `2xx` http status codes."
   {::ok                            200
    ::created                       201
    ::accepted                      202
@@ -30,7 +30,7 @@
 
 (def ^{:added "0.0.7"}
   redirection-status-codes
-  "HTTP `redirection` 3xx status codes."
+  "Redirection `3xx` http status codes."
   {::multiple-choices   300
    ::moved-permanently  301
    ::found              302
@@ -44,7 +44,7 @@
 
 (def ^{:added "0.0.7"}
   client-error-status-codes
-  "HTTP `client error` 4xx status codes."
+  "Client error `4xx` http status codes."
   {::bad-request                     400
    ::unauthorized                    401
    ::payment-required                402
@@ -67,7 +67,7 @@
 
 (def ^{:added "0.0.7"}
   server-error-status-codes
-  "HTTP `server error` 5xx status codes."
+  "Server error `5xx` http status codes."
   {::internal-server-error      500
    ::not-implemented            501
    ::bad-gateway                502
@@ -77,8 +77,8 @@
 
 
 (def ^{:added "0.0.7"}
-  response-type->http-status
-  "HTTP status codes."
+  type->http
+  "Map of response type and http status. E.g.  {::ok 200 ...}."
   (merge informational-status-codes
     success-status-codes
     redirection-status-codes
@@ -87,9 +87,15 @@
 
 
 (def ^{:added "0.0.7"}
-  http-status->response-type
-  "Mapping http status to response type."
-  (set/map-invert response-type->http-status))
+  http->type
+  "Map of http status and response type. E.g. {200 ::ok ...}."
+  (set/map-invert type->http))
+
+
+(def ^{:added "0.0.10"}
+  allowed-types
+  "Allowed response types."
+  (set (keys type->http)))
 
 
 
@@ -100,12 +106,12 @@
 (defn to-status
   "Returns a http status by the given response type."
   {:added "0.0.7"}
-  [response-type]
-  (get response-type->http-status response-type))
+  [type]
+  (get type->http type))
 
 
 (defn to-type
   "Returns a response type by the given http status."
   {:added "0.0.7"}
-  [http-status]
-  (get http-status->response-type http-status))
+  [http]
+  (get http->type http))
