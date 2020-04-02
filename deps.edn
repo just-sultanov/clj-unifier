@@ -6,14 +6,14 @@
                                      tongue                    {:mvn/version "0.2.9"}}
                        :extra-paths ["examples/src"]}
 
-           :repl      {:extra-deps  {nrepl            {:mvn/version "0.6.0"}
+           :repl      {:extra-deps  {nrepl            {:mvn/version "0.7.0"}
                                      cider/piggieback {:mvn/version "0.4.2"}}
                        :extra-paths ["dev/src"]
                        :main-opts   ["--main" "nrepl.cmdline"
                                      "--middleware" "[cider.piggieback/wrap-cljs-repl]"]}
 
-           :test-clj  {:extra-deps  {lambdaisland/kaocha           {:mvn/version "0.0-597"}
-                                     lambdaisland/kaocha-cloverage {:mvn/version "0.0-41"}}
+           :test-clj  {:extra-deps  {lambdaisland/kaocha           {:mvn/version "1.0-612"}
+                                     lambdaisland/kaocha-cloverage {:mvn/version "1.0-45"}}
                        :extra-paths ["test/src"]}
 
            :test-cljs {:extra-deps  {olical/cljs-test-runner {:mvn/version "3.7.0"}}
