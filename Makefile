@@ -7,111 +7,103 @@ SHELL = bash
 include .env
 
 
+define pprint
+	@echo -e "$(PRIMARY_TEXT_COLOR)"
+	@echo -e "$(LINES)"
+	@echo -e $(1)
+	@echo -e "$(LINES)"
+	@echo -e "$(NORMAL_TEXT_COLOR)"
+endef
+
+
 help: ## Show help
-	@awk 'BEGIN {FS = ":.*?## "} /^[a-zA-Z_-]+:.*?## / {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}' $(MAKEFILE_LIST)
+	@awk 'BEGIN {FS = ":.*?## "} /^[a-zA-Z_-]+:.*?## / {printf "$(PRIMARY_TEXT_COLOR)%-30s$(NORMAL_TEXT_COLOR) %s\n", $$1, $$2}' $(MAKEFILE_LIST)
 
 
 clean: ## Clean
-	@echo "=================================================================="
-	@echo "Clean..."
-	@echo "=================================================================="
+	$(call pprint, "Clean...")
 	rm -rf .cljs_node_repl out target pom.xml
-	@echo -e "\n"
 
 
 repl: ## Run REPL
-	@echo "=================================================================="
-	@echo "Run REPL..."
-	@echo "=================================================================="
+	$(call pprint, "Run REPL...")
 	clj -A:common:test-clj:test-cljs:repl
 
 
 lint: ## Run linter
-	@echo "=================================================================="
-	@echo "Run linter..."
-	@echo "=================================================================="
+	$(call pprint, "Run linter...")
 	clj-kondo --lint src:test/src:dev/src
-	@echo -e "\n"
 
 
 test-cljs: ## Run ClojureScript tests
-	@echo "=================================================================="
-	@echo "Run ClojureScript tests..."
-	@echo "=================================================================="
+	$(call pprint, "Run ClojureScript tests...")
 	clojure -A:common:test-cljs
-	@echo -e "\n"
 
 
 test-clj: ## Run Clojure tests
-	@echo "=================================================================="
-	@echo "Run Clojure tests..."
-	@echo "=================================================================="
+	$(call pprint, "Run Clojure tests...")
 	./bin/kaocha
-	@echo -e "\n"
 
 
 test: test-clj test-cljs ## Run tests
 
 
 jar: ## Build jar
-	@echo "=================================================================="
-	@echo "Build..."
-	@echo "=================================================================="
+	$(call pprint, "Build jar...")
 	clojure -A:build
 	clojure -A:version --pom --group-id ${GROUP_ID} --artifact-id ${ARTIFACT_ID} --scm-url ${SCM_URL}
-	@echo -e "\n"
 
 
 install: ## Install locally
-	@echo "=================================================================="
-	@echo "Install..."
-	@echo "=================================================================="
+	$(call pprint, "Install locally...")
 	clojure -A:install
-	@echo -e "\n"
 
 
 deploy: ## Deploy to repository
-	@echo "=================================================================="
-	@echo "Deploy..."
-	@echo "=================================================================="
+	$(call pprint, "Deploy to repository...")
 	clojure -A:deploy
-	@echo -e "\n"
 
 
 init: ## Init first version
+	$(call pprint, "Init first version...")
 	git tag --annotate --message ${TAG_MSG} v0.0.1
 
 
 patch: ## Increment patch version
+	$(call pprint, "Increment patch version...")
 	clojure -A:version patch --tag --message ${TAG_MSG}
 
 
 minor: ## Increment minor version
+	$(call pprint, "Increment minor version...")
 	clojure -A:version minor --tag --message ${TAG_MSG}
 
 
 major: ## Increment major version
+	$(call pprint, "Increment major version...")
 	clojure -A:version major --tag --message ${TAG_MSG}
 
 
 minor-rc: ## Increment minor-rc version
+	$(call pprint, "Increment minor-rc version...")
 	clojure -A:version minor-rc --tag --message ${TAG_MSG}
 
 
 major-rc: ## Increment major-rc version
+	$(call pprint, "Increment major-rc version...")
 	clojure -A:version major-rc --tag --message ${TAG_MSG}
 
 
 minor-release: ## Increment minor-release version
+	$(call pprint, "Increment minor-release version...")
 	clojure -A:version minor-release --tag --message ${TAG_MSG}
 
 
 major-release: ## Increment major-release version
+	$(call pprint, "Increment major-release version...")
 	clojure -A:version major-release --tag --message ${TAG_MSG}
 
 
 release: ## Release a new version
-	@echo "=================================================================="
-	@echo "Release..."
-	@echo "=================================================================="
+	$(call pprint, "Release a new version...")
 	git push origin --tags
