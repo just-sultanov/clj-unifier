@@ -1,5 +1,13 @@
 == Changelog
 
+=== v0.0.14
+
+* Fixed throwing exceptions in the `link!` function
+* Updated deps
+- nrepl {:mvn/version "0.7.0"}
+- lambdaisland/kaocha {:mvn/version "1.0-612"}
+- lambdaisland/kaocha-cloverage {:mvn/version "1.0-45"}
+
 === v0.0.13
 
 * Changed project dependencies:
