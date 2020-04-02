@@ -3,7 +3,10 @@
    #?(:clj  [clojure.test :refer [deftest testing is use-fixtures]]
       :cljs [cljs.test :refer-macros [deftest testing is use-fixtures]])
    [unifier.response.http :as http]
-   [unifier.response :as sut]))
+   [unifier.response :as sut])
+  #?(:clj
+     (:import
+      (clojure.lang ExceptionInfo))))
 
 ;;;;
 ;; Fixtures
@@ -228,12 +231,9 @@
     (is (= ::http/ok (get @sut/*registry ::ok1)))
     (is (= ::http/bad-request (get @sut/*registry ::bad-request1)))
     (is (= ::http/not-found (get @sut/*registry ::not-found1)))
-    (is (thrown? #?(:clj IllegalArgumentException, :cljs js/Error)
-          (sut/link! ::ok1 ::http/ok)))
-    (is (thrown? #?(:clj IllegalArgumentException, :cljs js/Error)
-          (sut/link! ::bad-request1 ::http/bad-request)))
-    (is (thrown? #?(:clj IllegalArgumentException, :cljs js/Error)
-          (sut/link! ::not-found1 ::http/not-found)))
+    (is (thrown? #?(:clj ExceptionInfo :cljs js/Error) (sut/link! ::ok1 ::http/ok)))
+    (is (thrown? #?(:clj ExceptionInfo :cljs js/Error) (sut/link! ::bad-request1 ::http/bad-request)))
+    (is (thrown? #?(:clj ExceptionInfo :cljs js/Error) (sut/link! ::not-found1 ::http/not-found)))
     (is (true? (sut/link ::ok1 ::http/ok)))
     (is (true? (sut/link ::bad-request1 ::http/bad-request)))
     (is (true? (sut/link ::not-found1 ::http/not-found)))
@@ -247,12 +247,9 @@
 
 
   (testing "link bad http response types"
-    (is (thrown? #?(:clj IllegalArgumentException, :cljs js/Error)
-          (sut/link! ::ok ::ok)))
-    (is (thrown? #?(:clj IllegalArgumentException, :cljs js/Error)
-          (sut/link! ::bad-request ::bad-request)))
-    (is (thrown? #?(:clj IllegalArgumentException, :cljs js/Error)
-          (sut/link! ::not-found ::not-found1)))))
+    (is (thrown? #?(:clj ExceptionInfo :cljs js/Error) (sut/link! ::ok ::ok)))
+    (is (thrown? #?(:clj ExceptionInfo :cljs js/Error) (sut/link! ::bad-request ::bad-request)))
+    (is (thrown? #?(:clj ExceptionInfo :cljs js/Error) (sut/link! ::not-found ::not-found1)))))
 
 
 

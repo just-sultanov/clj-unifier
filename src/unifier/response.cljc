@@ -401,6 +401,7 @@
      (boolean (:ns env))))
 
 
+;; TODO: add finally? [body handler finally]
 #?(:clj
    (defmacro safe
      "Extended version of try-catch."
@@ -521,20 +522,18 @@
     * `http`    - http response type
 
   Throws:
-    * `IllegalArgumentException`:
+    * `ExceptionInfo`:
       - throws when the given http response type is unknown
       - throws when the given unified response type has been already associated with http response type"
   {:added "0.0.10"}
   [unified http & kvs]
   (when-not (contains? http/allowed-types http)
     (let [msg (helpers/format "Unknown http response type `%s`" http)]
-      (throw #?(:clj  (IllegalArgumentException. msg (ex-data {::http/type http}))
-                :cljs (js/Error. msg)))))
+      (throw (ex-info msg {::http/type http}))))
   (when-not *allow-override?*
     (when-some [http (get @*registry unified)]
       (let [msg (helpers/format "Unified response type `%s` already been associated with `%s`" unified http)]
-        (throw #?(:clj  (IllegalArgumentException. msg (ex-data {::type unified}))
-                  :cljs (js/Error. msg))))))
+        (throw (ex-info msg {::type unified})))))
   (swap! *registry assoc unified http)
   (if kvs
     (recur (first kvs) (second kvs) (nnext kvs))
