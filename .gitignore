@@ -2,9 +2,12 @@
 .cljs_node_repl
 .cpcache
 .idea
-node_modules
+classes
 out
 target
+.nrepl-port
 *.iml
 *.jar
 pom.xml
+
+!.clj-kondo/config.edn
