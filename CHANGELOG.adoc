@@ -1,5 +1,10 @@
 == Changelog
 
+=== v0.0.15
+
+* Changed error handling: `Exception` instead of `Throwable`
+* Updated deps
+
 === v0.0.14
 
 * Fixed throwing exceptions in the `link!` function
