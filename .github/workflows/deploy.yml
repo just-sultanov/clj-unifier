@@ -23,7 +23,7 @@ jobs:
     env:
       CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
     steps:
-      - name: Git checkout
+      - name: Checkout
         uses: actions/checkout@v1
 
       - name: Setup java
@@ -37,7 +37,7 @@ jobs:
           tools-deps: latest
 
       - name: Cache clojure deps
-        uses: actions/cache@v1
+        uses: actions/cache@v2
         with:
           path: ~/.m2/repository
           key: clojure-${{ hashFiles('**/deps.edn') }}
@@ -64,13 +64,13 @@ jobs:
       CLOJARS_USERNAME: ${{ secrets.CLOJARS_USERNAME }}
       CLOJARS_PASSWORD: ${{ secrets.CLOJARS_PASSWORD }}
     steps:
-      - name: Git checkout
+      - name: Checkout
         uses: actions/checkout@v1
 
       - name: Setup java
         uses: actions/setup-java@v1
         with:
-          java-version: '13'
+          java-version: '14'
 
       - name: Setup clojure
         uses: DeLaGuardo/setup-clojure@2.0
@@ -78,7 +78,7 @@ jobs:
           tools-deps: latest
 
       - name: Cache clojure deps
-        uses: actions/cache@v1
+        uses: actions/cache@v2
         with:
           path: ~/.m2/repository
           key: clojure-${{ hashFiles('**/deps.edn') }}

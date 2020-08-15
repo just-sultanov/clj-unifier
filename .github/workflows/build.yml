@@ -20,7 +20,7 @@ jobs:
     env:
       CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
     steps:
-      - name: Git checkout
+      - name: Checkout
         uses: actions/checkout@v1
 
       - name: Setup java
@@ -34,7 +34,7 @@ jobs:
           tools-deps: latest
 
       - name: Cache clojure deps
-        uses: actions/cache@v1
+        uses: actions/cache@v2
         with:
           path: ~/.m2/repository
           key: clojure-${{ hashFiles('**/deps.edn') }}
