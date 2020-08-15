@@ -412,7 +412,7 @@
      ([body handler]
       `(try
          ~body
-         (catch ~(if-not (cljs? &env) 'Throwable :default) error#
+         (catch ~(if-not (cljs? &env) 'Exception :default) error#
            (when-some [handler# ~handler]
              (handler# error#)))))))
 
