@@ -2,18 +2,18 @@
 
  :deps    {org.clojure/clojure {:mvn/version "1.10.1"}}
 
- :aliases {:common    {:extra-deps  {org.clojure/clojurescript {:mvn/version "1.10.597"}
-                                     tongue                    {:mvn/version "0.2.9"}}
+ :aliases {:common    {:extra-deps  {org.clojure/clojurescript {:mvn/version "1.10.773"}
+                                     tongue/tongue             {:mvn/version "0.2.9"}}
                        :extra-paths ["examples/src"]}
 
-           :repl      {:extra-deps  {nrepl            {:mvn/version "0.7.0"}
-                                     cider/piggieback {:mvn/version "0.4.2"}}
+           :repl      {:extra-deps  {nrepl/nrepl      {:mvn/version "0.8.0"}
+                                     cider/piggieback {:mvn/version "0.5.1"}}
                        :extra-paths ["dev/src"]
                        :main-opts   ["--main" "nrepl.cmdline"
                                      "--middleware" "[cider.piggieback/wrap-cljs-repl]"]}
 
-           :test-clj  {:extra-deps  {lambdaisland/kaocha           {:mvn/version "1.0-612"}
-                                     lambdaisland/kaocha-cloverage {:mvn/version "1.0-45"}}
+           :test-clj  {:extra-deps  {lambdaisland/kaocha           {:mvn/version "1.0.641"}
+                                     lambdaisland/kaocha-cloverage {:mvn/version "1.0.56"}}
                        :extra-paths ["test/src"]}
 
            :test-cljs {:extra-deps  {olical/cljs-test-runner {:mvn/version "3.7.0"}}
@@ -21,14 +21,14 @@
                        :main-opts   ["--main" "cljs-test-runner.main"
                                      "--out" "target/test-cljs"]}
 
-           :build     {:extra-deps {seancorfield/depstar {:mvn/version "0.5.2"}}
+           :build     {:extra-deps {seancorfield/depstar {:mvn/version "1.0.97"}}
                        :main-opts  ["--main" "hf.depstar.jar" "target/clj-unifier.jar"]}
 
            :version   {:extra-deps {com.workframe/garamond {:mvn/version "0.4.0"}}
                        :main-opts  ["--main" "garamond.main"]}
 
-           :install   {:extra-deps {deps-deploy {:mvn/version "0.0.9"}}
+           :install   {:extra-deps {deps-deploy/deps-deploy {:mvn/version "0.0.9"}}
                        :main-opts  ["--main" "deps-deploy.deps-deploy" "install" "target/clj-unifier.jar"]}
 
-           :deploy    {:extra-deps {deps-deploy {:mvn/version "0.0.9"}}
+           :deploy    {:extra-deps {deps-deploy/deps-deploy {:mvn/version "0.0.9"}}
                        :main-opts  ["--main" "deps-deploy.deps-deploy" "deploy" "target/clj-unifier.jar"]}}}
