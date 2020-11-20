@@ -9,6 +9,8 @@ image:https://cljdoc.org/badge/clj-unifier/clj-unifier[cljdoc,link=https://cljdo
 
 A Clojure(Script) library for unified responses.
 
+> You can use the next generation of this library - link:https://github.com/anywhere-ninja/unifier[ninja.anywhere/unifier]
+
 === Quick Start Guide
 
 Add the following dependency in your project:
