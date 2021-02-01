@@ -5,11 +5,14 @@ image:https://github.com/just-sultanov/clj-unifier/workflows/deploy/badge.svg[de
 image:https://img.shields.io/clojars/v/clj-unifier.svg[clojars,link=https://clojars.org/clj-unifier]
 image:https://cljdoc.org/badge/clj-unifier/clj-unifier[cljdoc,link=https://cljdoc.org/d/clj-unifier/clj-unifier/CURRENT]
 
+
+*Attention!* 
+
+This library is DEPRECATED! Use the next library - link:https://github.com/just-sultanov/ninja.platform/blob/master/docs/ninja.tools/ninja.response.adoc[ninja.platform/response]
+
 == clj-unifier
 
 A Clojure(Script) library for unified responses.
-
-> You can use the next generation of this library - link:https://github.com/anywhere-ninja/unifier[ninja.anywhere/unifier]
 
 === Quick Start Guide
 
